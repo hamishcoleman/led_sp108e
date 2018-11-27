@@ -1,0 +1,10 @@
+Notes from watching the app traffic:
+
+On startup
+- it does an arp scan of the connected network
+- connects to TCP/7 , but doesnt send any traffic if connection accepted
+
+On "add device"
+- UI asks for the wifi password
+- sends to 234.1.1.1 UDP/7001 various sized packets filled with ascii "1"
+
