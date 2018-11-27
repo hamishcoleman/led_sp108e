@@ -8,3 +8,11 @@ On "add device"
 - UI asks for the wifi password
 - sends to 234.1.1.1 UDP/7001 various sized packets filled with ascii "1"
 
+    sizes:
+        557 556 555 554 245 352 132
+        557 556 555 554 285 340 218
+        557 556 555 554 213 354 262
+        557 556 555 554 279 342 256
+
+    looks like it could be an mtu scan, especially since the controllers
+    AP mode issues an MTU of 576
