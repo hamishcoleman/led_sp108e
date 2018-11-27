@@ -38,15 +38,19 @@ def txn_sync_expect(sock, sendbytes, expectbytes):
     assert(r == expectbytes)
     return r
 
+def frame(packet):
+    """ Add the framing bytes """
+    return b'8' + packet + b'\x83'
+
 def main(args):
     print("Connecting to {}:{}".format(args.host, args.port))
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((args.host, args.port))
 
-    txn_sync_expect(s, b'8\xe5\x23\xd3\xd5\x83', b'\x01\x02\x03\x04\x05\xcf')
-    txn_sync_expect(s, b'8\xc5\x1b\xa9\xd5\x83', b'\x01\x02\x03\x04\x05\x6d')
-    txn_sync_expect(s, b'8\xd9\x0f\xbd\x10\x83', b'\x38\x01\xfc\x80\xff\x02\x00\x32\x00\x01\xff\x00\x00\x03\x00\xff\x83')
+    txn_sync_expect(s, frame(b'\xe5\x23\xd3\xd5'), b'\x01\x02\x03\x04\x05\xcf')
+    txn_sync_expect(s, frame(b'\xc5\x1b\xa9\xd5'), b'\x01\x02\x03\x04\x05\x6d')
+    txn_sync_expect(s, frame(b'\xd9\x0f\xbd\x10'), b'\x38\x01\xfc\x80\xff\x02\x00\x32\x00\x01\xff\x00\x00\x03\x00\xff\x83')
 
 if __name__ == '__main__':
     args = do_options()
