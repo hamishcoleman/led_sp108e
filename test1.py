@@ -42,15 +42,24 @@ def frame(packet):
     """ Add the framing bytes """
     return b'8' + packet + b'\x83'
 
+def test_sequence_1(s):
+    """ Send the test sequence and confirm that things look OK """
+    txn_sync_expect(s, frame(b'\xe5\x23\xd3\xd5'), b'\x01\x02\x03\x04\x05\xcf')
+    txn_sync_expect(s, frame(b'\xc5\x1b\xa9\xd5'), b'\x01\x02\x03\x04\x05\x6d')
+    txn_sync_expect(s,
+        frame(b'\xd9\x0f\xbd\x10'),
+        b'\x38\x01\xfc\x80\xff\x02\x00\x40\x00\x01\xff\x00\x00\x03\x00\xff\x83'
+    )
+    # [7] is the number of leds in each segment (perhaps [6,7])
+    # suggesting that [8,9] is the number of segments
+
 def main(args):
     print("Connecting to {}:{}".format(args.host, args.port))
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((args.host, args.port))
 
-    txn_sync_expect(s, frame(b'\xe5\x23\xd3\xd5'), b'\x01\x02\x03\x04\x05\xcf')
-    txn_sync_expect(s, frame(b'\xc5\x1b\xa9\xd5'), b'\x01\x02\x03\x04\x05\x6d')
-    txn_sync_expect(s, frame(b'\xd9\x0f\xbd\x10'), b'\x38\x01\xfc\x80\xff\x02\x00\x32\x00\x01\xff\x00\x00\x03\x00\xff\x83')
+    test_sequence_1(s)
 
 if __name__ == '__main__':
     args = do_options()
