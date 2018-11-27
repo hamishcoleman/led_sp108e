@@ -53,11 +53,17 @@ def test_sequence_1(s):
     # [7] is the number of leds in each segment (perhaps [6,7])
     # suggesting that [8,9] is the number of segments
 
+def cmd_get_device_name(sock):
+    r = txn_sync(sock, frame(b'\x00\x00\x00\x77'))
+    return r.decode('utf-8')
+
 def main(args):
     print("Connecting to {}:{}".format(args.host, args.port))
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((args.host, args.port))
+
+    print("Connected to {}".format(cmd_get_device_name(s)))
 
     test_sequence_1(s)
 
