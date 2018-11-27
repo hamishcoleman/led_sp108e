@@ -16,3 +16,12 @@ On "add device"
 
     looks like it could be an mtu scan, especially since the controllers
     AP mode issues an MTU of 576
+
+- connects to TCP/8189
+
+    > 38e523d3d583
+    < 0102030405cf
+    > 38c51ba9d583
+    < 01020304056d
+    > 38d90fbd1083
+    < 3801fc80ff0200320001ff00000300ff83
