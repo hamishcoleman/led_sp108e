@@ -25,3 +25,7 @@ On "add device"
     < 01020304056d
     > 38d90fbd1083
     < 3801fc80ff0200320001ff00000300ff83
+
+---
+Some people on github have some hints:
+https://github.com/Spled/spled.github.io/issues/1
