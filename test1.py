@@ -53,10 +53,20 @@ def test_sequence_1(s):
     # [7] is the number of leds in each segment (perhaps [6,7])
     # suggesting that [8,9] is the number of segments
 
+def cmd_speed(sock,speed):
+    return txn(sock, frame(0x03, bytes([speed]) + b'\x00\x00'))
+
 def cmd_get_device_name(sock):
     r = txn_sync(sock, frame(0x77, b'\x00\x00\x00'))
     # FIXME - first char is a null - check and remove
     return r.decode('utf-8')
+
+def subc_speed(sock,args):
+    """Set automatic sequence display speed"""
+    assert (len(args.subc_args) == 1), "speed command takes 1 arg"
+
+    speed = int(args.subc_args[0])
+    cmd_speed(sock,speed)
 
 def subc_test1(sock,args):
     """Run a simple sanity check on the device"""
@@ -64,6 +74,7 @@ def subc_test1(sock,args):
 
 # A list of all the sub-commands
 subc_cmds = {
+    'speed': subc_speed,
     'test1': subc_test1,
 }
 
