@@ -164,14 +164,16 @@ Tested commands:
 0x15:           no response
 0x16:           CMD_SET_DEVICE_PASSWORD untested
 0x17 - 0x1b:    no response
-0x1c:           CMD_SET_IC_MODEL untested
+0x1c:           CMD_SET_IC_MODEL data1 is chip type 0-0x1c
 0x1d - 0x1f:    no response
 0x20:           CMD_GET_RECORD_NUM, returns 0x00, data appears to be ignored
 0x21:           no response
 0x22:           CMD_COLOR
                     data is RGB color to be used for any 'simple' mode
 0x23:           no response
-0x24:           CMD_CUSTOM_PREVIEW, returns 0x31, shows something like cmd0x02
+0x24:           CMD_CUSTOM_PREVIEW, returns 0x31
+                    shows something like CMD_CUSTOM_EFFECT
+                    then resets to modenr 0
 0x25:           CMD_CHANGE_PAGE, no response
 0x26 - 0x29:    no response
 0x2a:           CMD_BRIGHTNESS, data1 is brightness <2 = off

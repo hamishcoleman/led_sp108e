@@ -84,7 +84,7 @@ def assert_status_unknown(data):
         (data[2] == 0xfc)
     )
     assert data[5] <= 5
-    assert data[13] == 3
+    assert data[13] <= 0x1c
     assert data[14] == 0
     assert data[15] == 0 # have also seen 0xff in this field # noqa
 
@@ -147,6 +147,7 @@ def subc_status(sock, args):
     print("dotperseg =", state[6]*256 + state[7])
     print("segs =", state[8]*256 + state[9])
     print("staticcolor = {} {} {}".format(state[10], state[11], state[12]))
+    print("ic_model =", state[13])
 
     assert_status_unknown(state)
 
