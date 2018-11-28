@@ -89,10 +89,36 @@ def subc_test1(sock, args):
     test_sequence_1(sock)
 
 
+def subc_testcmd(sock, args):
+    """Send specified command and wait for response"""
+    assert (len(args.subc_args) > 0), "testcmd takes at least 1 arg"
+    assert (len(args.subc_args) < 5), "testcmd takes at most 4 args"
+
+    cmd = int(args.subc_args[0], 0)
+
+    if len(args.subc_args) > 1:
+        data1 = int(args.subc_args[1], 0)
+    else:
+        data1 = 0
+
+    if len(args.subc_args) > 2:
+        data2 = int(args.subc_args[2], 0)
+    else:
+        data2 = 0
+
+    if len(args.subc_args) > 3:
+        data3 = int(args.subc_args[3], 0)
+    else:
+        data3 = 0
+
+    r = txn_sync(sock, frame(cmd, bytes([data1,data2,data3])))
+
+
 # A list of all the sub-commands
 subc_cmds = {
     'speed': subc_speed,
     'test1': subc_test1,
+    'testcmd': subc_testcmd,
 }
 
 
