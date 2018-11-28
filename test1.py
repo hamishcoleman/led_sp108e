@@ -42,6 +42,9 @@ def txn_sync_expect(sock, sendbytes, expectbytes):
 
 def frame(cmd, data):
     """ Add the framing bytes """
+    if data is None:
+        data = b'\x00\x00\x00'
+
     packet = b'\x38' + data + bytes([cmd]) + b'\x83'
     assert(len(packet) == 6)
     return packet
@@ -52,7 +55,7 @@ def cmd_speed(sock, speed):
 
 
 def cmd_get_device_name(sock):
-    r = txn_sync(sock, frame(0x77, b'\x00\x00\x00'))
+    r = txn_sync(sock, frame(0x77, None))
     # FIXME - first char is a null - check and remove
     return r.decode('utf-8')
 
