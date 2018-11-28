@@ -8,6 +8,7 @@ import argparse
 import socket
 import binascii
 
+
 def txn(sock, sendbytes):
     """ Perform a tx transaction """
 
@@ -17,10 +18,11 @@ def txn(sock, sendbytes):
 
     sock.send(sendbytes)
 
+
 def txn_sync(sock, sendbytes):
     """ Perform a synchronous tx/rx transaction """
 
-    txn(sock,sendbytes)
+    txn(sock, sendbytes)
 
     recvbytes = sock.recv(4096)
 
@@ -30,11 +32,13 @@ def txn_sync(sock, sendbytes):
 
     return recvbytes
 
+
 def txn_sync_expect(sock, sendbytes, expectbytes):
     """ Perform a txn_sync() and confirm the result is as expected """
     r = txn_sync(sock, sendbytes)
     assert(r == expectbytes)
     return r
+
 
 def frame(cmd, data):
     """ Add the framing bytes """
@@ -42,8 +46,10 @@ def frame(cmd, data):
     assert(len(packet) == 6)
     return packet
 
-def cmd_speed(sock,speed):
+
+def cmd_speed(sock, speed):
     return txn(sock, frame(0x03, bytes([speed]) + b'\x00\x00'))
+
 
 def cmd_get_device_name(sock):
     r = txn_sync(sock, frame(0x77, b'\x00\x00\x00'))
@@ -55,27 +61,33 @@ def cmd_get_device_name(sock):
 # Above this line, code should be generic enough to be turned into a library
 #
 
+
 def test_sequence_1(s):
     """ Send the test sequence and confirm that things look OK """
-    txn_sync_expect(s, frame(0xd5, b'\xe5\x23\xd3'), b'\x01\x02\x03\x04\x05\xcf')
-    txn_sync_expect(s, frame(0xd5, b'\xc5\x1b\xa9'), b'\x01\x02\x03\x04\x05\x6d')
     txn_sync_expect(s,
-        frame(0x10, b'\xd9\x0f\xbd'),
+                    frame(0xd5, b'\xe5\x23\xd3'), b'\x01\x02\x03\x04\x05\xcf')
+    txn_sync_expect(s,
+                    frame(0xd5, b'\xc5\x1b\xa9'), b'\x01\x02\x03\x04\x05\x6d')
+    txn_sync_expect(
+        s, frame(0x10, b'\xd9\x0f\xbd'),
         b'\x38\x01\xfc\x01\x0a\x02\x00\x3c\x00\x01\xb3\x00\xff\x03\x00\xff\x83'
     )
     # [7] is the number of leds in each segment (perhaps [6,7])
     # suggesting that [8,9] is the number of segments
 
-def subc_speed(sock,args):
+
+def subc_speed(sock, args):
     """Set automatic sequence display speed"""
     assert (len(args.subc_args) == 1), "speed command takes 1 arg"
 
     speed = int(args.subc_args[0])
-    cmd_speed(sock,speed)
+    cmd_speed(sock, speed)
 
-def subc_test1(sock,args):
+
+def subc_test1(sock, args):
     """Run a simple sanity check on the device"""
     test_sequence_1(sock)
+
 
 # A list of all the sub-commands
 subc_cmds = {
@@ -83,10 +95,11 @@ subc_cmds = {
     'test1': subc_test1,
 }
 
+
 def do_options():
     a = argparse.ArgumentParser('Reverse Engineer Protocol for SP108E')
-    a.add_argument('-H','--host', action='store', default='192.168.4.1')
-    a.add_argument('-p','--port', action='store', default=8189)
+    a.add_argument('-H', '--host', action='store', default='192.168.4.1')
+    a.add_argument('-p', '--port', action='store', default=8189)
 
     subc = a.add_subparsers(help='Subcommand', dest='cmd')
     subc.required = True
@@ -96,6 +109,7 @@ def do_options():
         parser.add_argument('subc_args', nargs='*')
 
     return a.parse_args()
+
 
 def main(args):
     print("Connecting to {}:{}".format(args.host, args.port))
@@ -107,7 +121,9 @@ def main(args):
 
     args.func(s, args)
 
+    # txn_sync(s, frame(0xd5, b'\x00\x00\x00')) # check_device?
+
+
 if __name__ == '__main__':
     args = do_options()
     main(args)
-
