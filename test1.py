@@ -42,6 +42,19 @@ def frame(cmd, data):
     assert(len(packet) == 6)
     return packet
 
+def cmd_speed(sock,speed):
+    return txn(sock, frame(0x03, bytes([speed]) + b'\x00\x00'))
+
+def cmd_get_device_name(sock):
+    r = txn_sync(sock, frame(0x77, b'\x00\x00\x00'))
+    # FIXME - first char is a null - check and remove
+    return r.decode('utf-8')
+
+#############################################################################
+#
+# Above this line, code should be generic enough to be turned into a library
+#
+
 def test_sequence_1(s):
     """ Send the test sequence and confirm that things look OK """
     txn_sync_expect(s, frame(0xd5, b'\xe5\x23\xd3'), b'\x01\x02\x03\x04\x05\xcf')
@@ -52,14 +65,6 @@ def test_sequence_1(s):
     )
     # [7] is the number of leds in each segment (perhaps [6,7])
     # suggesting that [8,9] is the number of segments
-
-def cmd_speed(sock,speed):
-    return txn(sock, frame(0x03, bytes([speed]) + b'\x00\x00'))
-
-def cmd_get_device_name(sock):
-    r = txn_sync(sock, frame(0x77, b'\x00\x00\x00'))
-    # FIXME - first char is a null - check and remove
-    return r.decode('utf-8')
 
 def subc_speed(sock,args):
     """Set automatic sequence display speed"""
