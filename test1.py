@@ -54,6 +54,10 @@ def cmd_speed(sock, speed):
     return txn(sock, frame(0x03, bytes([speed]) + b'\x00\x00'))
 
 
+def cmd_sync(sock):
+    return txn_sync(sock, frame(0x10, None))
+
+
 def cmd_get_device_name(sock):
     r = txn_sync(sock, frame(0x77, None))
     # FIXME - first char is a null - check and remove
@@ -63,6 +67,24 @@ def cmd_get_device_name(sock):
 #
 # Above this line, code should be generic enough to be turned into a library
 #
+
+
+def assert_frame(data):
+    """Confirm that the correct framing bytes are present"""
+    assert data[0] == 0x38
+    assert data[-1] == 0x83
+
+
+def assert_status_unknown(data):
+    """Assert if any of the unknown state fields changes"""
+    assert data[2] == 0xfc
+    assert data[5] == 0 # have also seen 2 in this field # noqa
+    assert data[10] == 0xff
+    assert data[11] == 0
+    assert data[12] == 0
+    assert data[13] == 3
+    assert data[14] == 0
+    assert data[15] == 0 # have also seen 0xff in this field # noqa
 
 
 def test_sequence_1(s):
@@ -90,6 +112,21 @@ def subc_speed(sock, args):
 
     speed = int(args.subc_args[0])
     cmd_speed(sock, speed)
+
+
+def subc_status(sock, args):
+    """Request device status"""
+    state = cmd_sync(sock)
+    assert_frame(state)
+
+    # TODO - move this into the library and object model
+    print("lamp =", state[1])
+    print("speed =", state[3])
+    print("brightness =", state[4])
+    print("dotperseg =", state[6]*256 + state[7])
+    print("segs =", state[8]*256 + state[9])
+
+    assert_status_unknown(state)
 
 
 def subc_test1(sock, args):
@@ -126,6 +163,7 @@ def subc_testcmd(sock, args):
 subc_cmds = {
     'get_device_name': subc_get_device_name,
     'speed':   subc_speed,
+    'status':  subc_status,
     'test1':   subc_test1,
     'testcmd': subc_testcmd,
 }
