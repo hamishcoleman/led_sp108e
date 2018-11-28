@@ -53,10 +53,26 @@ def cmd_get_device_name(sock):
     # FIXME - first char is a null - check and remove
     return r.decode('utf-8')
 
+def subc_test1(sock,args):
+    """Run a simple sanity check on the device"""
+    test_sequence_1(sock)
+
+# A list of all the sub-commands
+subc_cmds = {
+    'test1': subc_test1,
+}
+
 def do_options():
     a = argparse.ArgumentParser('Reverse Engineer Protocol for SP108E')
     a.add_argument('-H','--host', action='store', default='192.168.4.1')
     a.add_argument('-p','--port', action='store', default=8189)
+
+    subc = a.add_subparsers(help='Subcommand', dest='cmd')
+    subc.required = True
+    for key, value in subc_cmds.items():
+        parser = subc.add_parser(key, help=value.__doc__)
+        parser.set_defaults(func=value)
+        parser.add_argument('subc_args', nargs='*')
 
     return a.parse_args()
 
@@ -68,7 +84,7 @@ def main(args):
 
     print("Connected to {}".format(cmd_get_device_name(s)))
 
-    test_sequence_1(s)
+    args.func(s, args)
 
 if __name__ == '__main__':
     args = do_options()
