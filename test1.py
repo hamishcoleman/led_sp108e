@@ -77,11 +77,13 @@ def assert_frame(data):
 
 def assert_status_unknown(data):
     """Assert if any of the unknown state fields changes"""
-    assert data[2] == 0xfc
-    assert data[5] == 0 # have also seen 2 in this field # noqa
-    assert data[10] == 0xff
-    assert data[11] == 0
-    assert data[12] == 0
+    assert (
+        (data[2] <= 179) or
+        (data[2] >= 205 and data[2] <= 212) or
+        (data[2] == 219) or
+        (data[2] == 0xfc)
+    )
+    assert data[5] <= 5
     assert data[13] == 3
     assert data[14] == 0
     assert data[15] == 0 # have also seen 0xff in this field # noqa
@@ -119,12 +121,32 @@ def subc_status(sock, args):
     state = cmd_sync(sock)
     assert_frame(state)
 
+    modenames = {
+        205: 'meteor',
+        206: 'breathing',
+        207: 'stack',
+        208: 'flow',
+        209: 'wave',
+        210: 'flash',
+        211: 'static',
+        212: 'catch-up',
+        219: 'custom_effect',
+        0xfc: 'auto',
+    }
+    if state[2] in modenames:
+        modename = modenames[state[2]]
+    else:
+        modename = ''
+
     # TODO - move this into the library and object model
     print("lamp =", state[1])
+    print("mode = {} {}".format(state[2], modename))
     print("speed =", state[3])
     print("brightness =", state[4])
+    print("rgb_order =", state[5])
     print("dotperseg =", state[6]*256 + state[7])
     print("segs =", state[8]*256 + state[9])
+    print("staticcolor = {} {} {}".format(state[10], state[11], state[12]))
 
     assert_status_unknown(state)
 
