@@ -8,13 +8,6 @@ import argparse
 import socket
 import binascii
 
-def do_options():
-    a = argparse.ArgumentParser('Reverse Engineer Protocol for SP108E')
-    a.add_argument('-H','--host', action='store', default='192.168.4.1')
-    a.add_argument('-p','--port', action='store', default=8189)
-
-    return a.parse_args()
-
 def txn_sync(sock, sendbytes):
     """ Perform a synchronous transaction """
 
@@ -59,6 +52,13 @@ def cmd_get_device_name(sock):
     r = txn_sync(sock, frame(0x77, b'\x00\x00\x00'))
     # FIXME - first char is a null - check and remove
     return r.decode('utf-8')
+
+def do_options():
+    a = argparse.ArgumentParser('Reverse Engineer Protocol for SP108E')
+    a.add_argument('-H','--host', action='store', default='192.168.4.1')
+    a.add_argument('-p','--port', action='store', default=8189)
+
+    return a.parse_args()
 
 def main(args):
     print("Connecting to {}:{}".format(args.host, args.port))
