@@ -38,23 +38,26 @@ def txn_sync_expect(sock, sendbytes, expectbytes):
     assert(r == expectbytes)
     return r
 
-def frame(packet):
+def frame(cmd, data):
     """ Add the framing bytes """
-    return b'8' + packet + b'\x83'
+    packet = b'\x38' + data + bytes([cmd]) + b'\x83'
+    assert(len(packet) == 6)
+    return packet
 
 def test_sequence_1(s):
     """ Send the test sequence and confirm that things look OK """
-    txn_sync_expect(s, frame(b'\xe5\x23\xd3\xd5'), b'\x01\x02\x03\x04\x05\xcf')
-    txn_sync_expect(s, frame(b'\xc5\x1b\xa9\xd5'), b'\x01\x02\x03\x04\x05\x6d')
+    txn_sync_expect(s, frame(0xd5, b'\xe5\x23\xd3'), b'\x01\x02\x03\x04\x05\xcf')
+    txn_sync_expect(s, frame(0xd5, b'\xc5\x1b\xa9'), b'\x01\x02\x03\x04\x05\x6d')
     txn_sync_expect(s,
-        frame(b'\xd9\x0f\xbd\x10'),
-        b'\x38\x01\xfc\x80\xff\x02\x00\x40\x00\x01\xff\x00\x00\x03\x00\xff\x83'
+        frame(0x10, b'\xd9\x0f\xbd'),
+        b'\x38\x01\xfc\x01\x0a\x02\x00\x3c\x00\x01\xb3\x00\xff\x03\x00\xff\x83'
     )
     # [7] is the number of leds in each segment (perhaps [6,7])
     # suggesting that [8,9] is the number of segments
 
 def cmd_get_device_name(sock):
-    r = txn_sync(sock, frame(b'\x00\x00\x00\x77'))
+    r = txn_sync(sock, frame(0x77, b'\x00\x00\x00'))
+    # FIXME - first char is a null - check and remove
     return r.decode('utf-8')
 
 def main(args):
