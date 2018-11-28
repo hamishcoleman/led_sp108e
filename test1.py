@@ -79,6 +79,11 @@ def test_sequence_1(s):
     # suggesting that [8,9] is the number of segments
 
 
+def subc_get_device_name(sock, args):
+    """Request device name"""
+    print("Connected to {}".format(cmd_get_device_name(sock)))
+
+
 def subc_speed(sock, args):
     """Set automatic sequence display speed"""
     assert (len(args.subc_args) == 1), "speed command takes 1 arg"
@@ -119,8 +124,9 @@ def subc_testcmd(sock, args):
 
 # A list of all the sub-commands
 subc_cmds = {
-    'speed': subc_speed,
-    'test1': subc_test1,
+    'get_device_name': subc_get_device_name,
+    'speed':   subc_speed,
+    'test1':   subc_test1,
     'testcmd': subc_testcmd,
 }
 
@@ -145,8 +151,6 @@ def main(args):
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((args.host, int(args.port, 0)))
-
-    print("Connected to {}".format(cmd_get_device_name(s)))
 
     args.func(s, args)
 
