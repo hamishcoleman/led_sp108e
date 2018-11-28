@@ -58,15 +58,45 @@ https://github.com/Spled/spled.github.io/issues/1
 ---
 Seen commands:
 
+0x03: CMD_SPEED
+    d8 71 12 03 == None
+    db 87 eb 03 == None
+    f7 6c 22 03 == None
+    ff 7c 69 03 == None
+    0f 1f ec 03 == None
+    0c b8 bc 03 == None
+    05 50 df 03 == None
+    01 cf 49 03 == None
+
+
 0x10: CMD_SYNC
     17 8b 2e 10 == 38 01 fc 80 ff 02 00 40 00 01 ff 00 00 03 00 ff 83
     20 77 1d 10 == 38 01 fc 80 ff 02 00 40 00 01 ff 00 00 03 00 ff 83
     c3 c6 97 10 == 38 01 fc 80 ff 02 00 32 00 01 ff 00 00 02 00 ff 83
+    d3 f9 2f 10 == 38 01 d4 01 4c 02 00 40 00 01 00 d5 ff 03 00 ff 83
     d9 0f bd 10 == 38 01 fc 80 ff 02 00 32 00 01 ff 00 00 03 00 ff 83
     d9 0f bd 10 == 38 01 fc 80 ff 02 00 40 00 01 ff 00 00 03 00 ff 83
 
 0x22: CMD_COLOR
     00 00 ff 22 == None
+    ff 00 ff 22 == None
+    00 ff ff 22 == None
+    00 fe ff 22 == None
+
+0x2a: CMD_BRIGHTNESS
+    6b 12 51 2a == None
+    38 aa 8c 2a == None
+    49 a2 57 2a == None
+    4c a6 f0 2a == None
+
+0x2c: CMD_MODE_CHANGE
+    d4 37 94 2c == None
+    d1 b2 df 2c == None
+    ce 64 eb 2c == None
+    cd 92 e6 2c == None
+    d1 11 e6 2c == None
+    d4 d4 49 2c == None
+    d4 29 95 2c == None
 
 0x2d: CMD_DOT_COUNT
     00 01 f0 2d == None
@@ -106,3 +136,60 @@ Seen commands:
     e5 23 d3 d5 == 01 02 03 04 05 cf
     f8 85 72 d5 == 01 02 03 04 05 57
     fa 98 df d5 == 01 02 03 04 05 76
+
+---
+Tested commands:
+
+0x00:           no response
+0x01:           no response
+0x02:           CMD_CUSTOM_EFFECT, sets all white, data appears to do something
+0x03:           cmd_speed() works
+0x04:           no response
+0x05:           no response
+0x06:           CMD_MODE_AUTO, data appears to be ignored
+0x07:           CMD_CUSTOM_DELETE, restarts auto sequence, returns 0x31
+0x08 - 0x0f:    no response
+0x10:           CMD_SYNC, returns state, data appears to be ignored
+                    [0] = 0x38
+                    [1] = display on/off
+                    [3] = speed
+                    [4] = brightness
+                    [6:7] = dots per segment
+                    [8:9] = segments
+0x11 - 0x13:    no response
+0x14:           CMD_SET_DEVICE_NAME untested
+0x15:           no response
+0x16:           CMD_SET_DEVICE_PASSWORD untested
+0x17 - 0x1b:    no response
+0x1c:           CMD_SET_IC_MODEL untested
+0x1d - 0x1f:    no response
+0x20:           CMD_GET_RECORD_NUM, returns 0x00, data appears to be ignored
+0x21:           no response
+0x22:           CMD_COLOR, ignored in auto mode
+0x23:           no response
+0x24:           CMD_CUSTOM_PREVIEW, returns 0x31, shows something like cmd0x02
+0x25:           CMD_CHANGE_PAGE, no response
+0x26 - 0x29:    no response
+0x2a:           CMD_BRIGHTNESS, data1 is brightness <2 = off
+0x2b:           no response
+0x2c:           CMD_MODE_CHANGE, data1 is display pattern 0-179
+0x2d:           CMD_DOT_COUNT,
+                    data1 is low byte
+                    data2 is high byte
+                    dots is 1 - 0x697, outside this range it resets to 0x32
+0x2e:           CMD_SEC_COUNT,
+                    data1 is low byte
+                    data2 is high byte
+                    segs is 0 - ?
+                    display slows down with high numbers and watchdog might hit
+0x2f:           CMD_CHECK_DEVICE_IS_COOL, returns 0x31
+0x30 - 0x3b:    no response
+0x3c:           CMD_SET_RGB_SEQ no response
+0x3d - 0x4b:    no response
+0x4c:           CMD_CUSTOM_RECODE, returns 0x31, blanks screen for a bit
+0x4d - 0x76:    no response
+0x77:           cmd_get_device_name() works
+0x78 - 0x87:    no response
+0x88:           CMD_SET_DEVICE_TO_AP_MODE, brief pause in display animation
+0x89 - 0xa9:    no response
+0xaa:           CMD_TOGGLE_LAMP, returns state, toggles display on/off
