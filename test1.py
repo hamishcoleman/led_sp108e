@@ -114,7 +114,7 @@ def subc_testcmd(sock, args):
     else:
         data3 = 0
 
-    r = txn_sync(sock, frame(cmd, bytes([data1,data2,data3])))
+    txn_sync(sock, frame(cmd, bytes([data1, data2, data3])))
 
 
 # A list of all the sub-commands
@@ -141,10 +141,10 @@ def do_options():
 
 
 def main(args):
-    print("Connecting to {}:{}".format(args.host, int(args.port,0)))
+    print("Connecting to {}:{}".format(args.host, int(args.port, 0)))
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((args.host, int(args.port,0)))
+    s.connect((args.host, int(args.port, 0)))
 
     print("Connected to {}".format(cmd_get_device_name(s)))
 
