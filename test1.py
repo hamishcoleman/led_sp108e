@@ -117,18 +117,6 @@ def assert_status_unknown(data):
     assert data[15] == 0 # have also seen 0xff in this field # noqa
 
 
-def test_sequence_1(s):
-    """ Send the test sequence and confirm that things look OK """
-    txn_sync_expect(s,
-                    frame(0xd5, b'\xe5\x23\xd3'), b'\x01\x02\x03\x04\x05\xcf')
-    txn_sync_expect(s,
-                    frame(0xd5, b'\xc5\x1b\xa9'), b'\x01\x02\x03\x04\x05\x6d')
-    txn_sync_expect(
-        s, frame(0x10, b'\xd9\x0f\xbd'),
-        b'\x38\x01\xfc\x01\x0a\x02\x00\x3c\x00\x01\xb3\x00\xff\x03\x00\xff\x83'
-    )
-    # [7] is the number of leds in each segment (perhaps [6,7])
-    # suggesting that [8,9] is the number of segments
 
 
 def subc_check_device(sock, args):
@@ -196,11 +184,6 @@ def subc_status(sock, args):
     assert_status_unknown(state)
 
 
-def subc_test1(sock, args):
-    """Run a simple sanity check on the device"""
-    test_sequence_1(sock)
-
-
 def subc_testcmd(sock, args):
     """Send specified command and wait for response"""
     assert (len(args.subc_args) > 0), "testcmd takes at least 1 arg"
@@ -232,7 +215,6 @@ subc_cmds = {
     'get_device_name':  subc_get_device_name,
     'speed':   subc_speed,
     'status':  subc_status,
-    'test1':   subc_test1,
     'testcmd': subc_testcmd,
 }
 
@@ -259,8 +241,6 @@ def main(args):
     s.connect((args.host, int(args.port, 0)))
 
     args.func(s, args)
-
-    # txn_sync(s, frame(0xd5, b'\x00\x00\x00')) # check_device?
 
 
 if __name__ == '__main__':
