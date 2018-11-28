@@ -128,7 +128,7 @@ subc_cmds = {
 def do_options():
     a = argparse.ArgumentParser('Reverse Engineer Protocol for SP108E')
     a.add_argument('-H', '--host', action='store', default='192.168.4.1')
-    a.add_argument('-p', '--port', action='store', default=8189)
+    a.add_argument('-p', '--port', action='store', default='8189')
 
     subc = a.add_subparsers(help='Subcommand', dest='cmd')
     subc.required = True
@@ -141,10 +141,10 @@ def do_options():
 
 
 def main(args):
-    print("Connecting to {}:{}".format(args.host, args.port))
+    print("Connecting to {}:{}".format(args.host, int(args.port,0)))
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((args.host, args.port))
+    s.connect((args.host, int(args.port,0)))
 
     print("Connected to {}".format(cmd_get_device_name(s)))
 
