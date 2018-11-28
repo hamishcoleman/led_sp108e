@@ -8,15 +8,20 @@ import argparse
 import socket
 import binascii
 
-def txn_sync(sock, sendbytes):
-    """ Perform a synchronous transaction """
-
+def txn(sock, sendbytes):
+    """ Perform a tx transaction """
 
     # TODO - if verbose
     sendhex = binascii.hexlify(sendbytes).decode('utf-8')
     print("> {}".format(sendhex))
 
     sock.send(sendbytes)
+
+def txn_sync(sock, sendbytes):
+    """ Perform a synchronous tx/rx transaction """
+
+    txn(sock,sendbytes)
+
     recvbytes = sock.recv(4096)
 
     # TODO - if verbose
