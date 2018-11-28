@@ -77,11 +77,17 @@ Seen commands:
     d9 0f bd 10 == 38 01 fc 80 ff 02 00 32 00 01 ff 00 00 03 00 ff 83
     d9 0f bd 10 == 38 01 fc 80 ff 02 00 40 00 01 ff 00 00 03 00 ff 83
 
+0x14: CMD_SET_DEVICE_NAME
+    9b 9c 27 14 == 31, followed by 33 62 32 63 63 61 31 3a == None
+
 0x22: CMD_COLOR
     00 00 ff 22 == None
     ff 00 ff 22 == None
     00 ff ff 22 == None
     00 fe ff 22 == None
+
+0x24: CMD_CUSTOM_PREVIEW
+    e9 39 9a 24 == 31, followed by 900 bytes (300 RGBs) == 31 repeated
 
 0x2a: CMD_BRIGHTNESS
     6b 12 51 2a == None
@@ -203,3 +209,4 @@ Tested commands:
 0x88:           CMD_SET_DEVICE_TO_AP_MODE, brief pause in display animation
 0x89 - 0xa9:    no response
 0xaa:           CMD_TOGGLE_LAMP, returns state, toggles display on/off
+0xd7:           cmd_check_device() works
