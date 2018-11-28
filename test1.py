@@ -63,6 +63,34 @@ def cmd_get_device_name(sock):
     # FIXME - first char is a null - check and remove
     return r.decode('utf-8')
 
+
+def cmd_check_device(sock, challenge):
+    """Send a check packet, and confirm the result is sane"""
+    if challenge is None:
+        challenge = 0x73a52b # chosen by a fair dice roll # noqa
+
+    data = bytes([
+        challenge % 256,
+        challenge // 256 % 256,
+        challenge // 256 // 256 % 256,
+    ])
+
+    r = txn_sync(sock, frame(0xd5, data))
+
+    assert r[0] == 1
+    assert r[1] == 2
+    assert r[2] == 3
+    assert r[3] == 4
+    assert r[4] == 5
+    assert r[5] == (
+        challenge & 0x53 |
+        (challenge & 0x3f00) >> 6 |
+        (challenge & 0xe00000) >> 21
+    )
+
+    return r[5]
+
+
 #############################################################################
 #
 # Above this line, code should be generic enough to be turned into a library
@@ -101,6 +129,22 @@ def test_sequence_1(s):
     )
     # [7] is the number of leds in each segment (perhaps [6,7])
     # suggesting that [8,9] is the number of segments
+
+
+def subc_check_device(sock, args):
+    """Send a bunch of check device packets"""
+    assert (len(args.subc_args) == 1), "check_device command takes 1 arg"
+
+    challenge = int(args.subc_args[0], 0)
+
+    while challenge < 0x1000000:
+        r = cmd_check_device(sock, challenge)
+        print(
+            "T: 0x{0:06x} == 0x{1:02x}, {0:24b} == {1:8b}".format(
+                challenge, r
+            )
+        )
+        challenge *= 2
 
 
 def subc_get_device_name(sock, args):
@@ -184,7 +228,8 @@ def subc_testcmd(sock, args):
 
 # A list of all the sub-commands
 subc_cmds = {
-    'get_device_name': subc_get_device_name,
+    'check_device':     subc_check_device,
+    'get_device_name':  subc_get_device_name,
     'speed':   subc_speed,
     'status':  subc_status,
     'test1':   subc_test1,
