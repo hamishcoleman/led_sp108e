@@ -59,9 +59,14 @@ https://github.com/Spled/spled.github.io/issues/1
 Seen commands:
 
 0x10: CMD_SYNC
+    17 8b 2e 10 == 38 01 fc 80 ff 02 00 40 00 01 ff 00 00 03 00 ff 83
+    20 77 1d 10 == 38 01 fc 80 ff 02 00 40 00 01 ff 00 00 03 00 ff 83
     c3 c6 97 10 == 38 01 fc 80 ff 02 00 32 00 01 ff 00 00 02 00 ff 83
     d9 0f bd 10 == 38 01 fc 80 ff 02 00 32 00 01 ff 00 00 03 00 ff 83
     d9 0f bd 10 == 38 01 fc 80 ff 02 00 40 00 01 ff 00 00 03 00 ff 83
+
+0x22: CMD_COLOR
+    00 00 ff 22 == None
 
 0x2d: CMD_DOT_COUNT
     00 01 f0 2d == None
@@ -86,13 +91,16 @@ Seen commands:
     f7 28 67 2f == 31
 
 0xd5: CMD_CHECK_DEVICE
+    53 6c 9a d5 == 01 02 03 04 05 f7
     72 4d 53 d5 == 01 02 03 04 05 76
     81 89 c8 d5 == 01 02 03 04 05 27
     87 c4 80 d5 == 01 02 03 04 05 17
     91 81 a2 d5 == 01 02 03 04 05 15
     9b ae 6b d5 == 01 02 03 04 05 bb
     a5 49 5a d5 == 01 02 03 04 05 27
+    a8 d1 b8 d5 == 01 02 03 04 05 45
     bc 1a b6 d5 == 01 02 03 04 05 7d
+    bd fe a6 d5 == 01 02 03 04 05 fd
     c3 85 b5 d5 == 01 02 03 04 05 57
     c5 1b a9 d5 == 01 02 03 04 05 6d
     e5 23 d3 d5 == 01 02 03 04 05 cf
