@@ -121,10 +121,15 @@ int main(int argc, char **argv) {
         int pix;
 
         for(pix=0; pix<60; pix++) {
-            *dst++ = *src++;
-            *dst++ = *src++;
-            *dst++ = *src++;
-            src++;
+            /* TODO - this should not be hardcoded */
+            char blue  = *src++;
+            char green = *src++;
+            char red   = *src++;
+            src++; // 32 bits per pixel
+
+            *dst++ = red;
+            *dst++ = green;
+            *dst++ = blue;
             dst+=12;
         }
 
