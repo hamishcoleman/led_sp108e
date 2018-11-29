@@ -98,6 +98,18 @@ int main(int argc, char **argv) {
             AllPlanes, ZPixmap
         );
 
+/*
+        printf("byte_order=%i bitmap_unit=%i bitmap_bit_order=%i bitmap_pad=%i\n",
+            xi->byte_order, xi->bitmap_unit, xi->bitmap_bit_order,
+            xi->bitmap_pad
+        );
+        printf("rmask=%x gmask=%x bmask=%x\n",
+            xi->red_mask,
+            xi->green_mask,
+            xi->blue_mask
+        );
+*/
+
         memset(frame, 0, sizeof(frame));
 
         /* assume
