@@ -212,3 +212,20 @@ Tested commands:
 0xab - 0xd4:    no response
 0xd5:           cmd_check_device() works
 0xd6 - 0xff:    no response
+
+---
+CMD_CUSTOM_PREVIEW:
+
+With a 60 pixel array attached, some trials were done.
+Frames full of random pixels were sent in rapid sequence
+
+Sending a frame with less than 192 triplets did not show proper animation.
+Sending 192 triplets showed 40 pixels animating
+Sending 197 triplets showed 41 pixels animating
+Sending 202 triplets showed 42 pixels animating
+Sending 285 triplets showed 58 pixels animating
+Sending 290 triplets showed 59 pixels animating
+Sending 292 triplets showed 60 pixels animating
+
+pixels appear to be interleaved or similar.
+Pixel 1 is octets 0,1,2 - pixel 2 is octets 15,16,17

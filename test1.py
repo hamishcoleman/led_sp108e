@@ -7,6 +7,7 @@ import argparse
 
 import socket
 import binascii
+import random
 
 
 def txn(sock, sendbytes):
@@ -117,6 +118,37 @@ def assert_status_unknown(data):
     assert data[15] == 0 # have also seen 0xff in this field # noqa
 
 
+def test_frame():
+    """Generate a single frame to send to the array"""
+    maxlen = 292
+    minlen = 6
+    offset = 0
+    fill = b'\x11\x00\x00'
+
+    a = bytes(offset*3)
+    while len(a) < minlen*3:
+        a += bytes([
+            random.randrange(256),
+            random.randrange(256),
+            random.randrange(256),
+            0, 0, 0,
+            0, 0, 0,
+            0, 0, 0,
+            0, 0, 0,
+        ])
+    while len(a) < maxlen*3:
+        a += fill
+
+    return a
+
+
+def subc_testpreview(sock, args):
+    """Try to send video"""
+    txn_sync_expect(sock, frame(0x24, None), b'\x31')
+
+    for i in range(100):
+        a = test_frame()
+        txn_sync_expect(sock, a, b'\x31')
 
 
 def subc_check_device(sock, args):
@@ -216,6 +248,7 @@ subc_cmds = {
     'speed':   subc_speed,
     'status':  subc_status,
     'testcmd': subc_testcmd,
+    'testpreview': subc_testpreview,
 }
 
 
