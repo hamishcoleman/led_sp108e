@@ -120,13 +120,14 @@ def assert_status_unknown(data):
 
 def test_frame():
     """Generate a single frame to send to the array"""
-    maxlen = 292
-    minlen = 6
-    offset = 0
-    fill = b'\x11\x00\x00'
+    maxlen = 60         # Number of pixels in frame
+    minlen1 = 38        # Last pixel with random color
+    offset = 35         # Cound of blank pixels at beginning of frame
 
-    a = bytes(offset*3)
-    while len(a) < minlen*3:
+    fill = bytes([0x11,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
+
+    a = bytes(offset*15)
+    while len(a) < minlen1*15:
         a += bytes([
             random.randrange(256),
             random.randrange(256),
@@ -136,7 +137,7 @@ def test_frame():
             0, 0, 0,
             0, 0, 0,
         ])
-    while len(a) < maxlen*3:
+    while len(a) < maxlen*15:
         a += fill
 
     return a

@@ -229,3 +229,13 @@ Sending 292 triplets showed 60 pixels animating
 
 pixels appear to be interleaved or similar.
 Pixel 1 is octets 0,1,2 - pixel 2 is octets 15,16,17
+
+Note that the wifi device advertises an MTU of 576, however when sending
+the pixel data, this does not work properly.  Once the transmitted frame
+is broken into more than one TCP packet, something goes wrong with the
+pixel layout.
+
+Android ignores the MTU offered by the device, so we can do that too (for
+testing at least) with the following command:
+
+    sudo ip route add 192.168.4.1 dev wlan0 mtu 1500
