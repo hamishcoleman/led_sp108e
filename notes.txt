@@ -209,4 +209,6 @@ Tested commands:
 0x88:           CMD_SET_DEVICE_TO_AP_MODE, brief pause in display animation
 0x89 - 0xa9:    no response
 0xaa:           CMD_TOGGLE_LAMP, returns state, toggles display on/off
-0xd7:           cmd_check_device() works
+0xab - 0xd4:    no response
+0xd5:           cmd_check_device() works
+0xd6 - 0xff:    no response
