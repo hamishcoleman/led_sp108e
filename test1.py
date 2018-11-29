@@ -6,7 +6,6 @@
 import argparse
 
 import socket
-import binascii
 import random
 
 
@@ -14,8 +13,7 @@ def txn(sock, sendbytes):
     """ Perform a tx transaction """
 
     # TODO - if verbose
-    sendhex = binascii.hexlify(sendbytes).decode('utf-8')
-    print("> {}".format(sendhex))
+    print("> {}".format(sendbytes.hex()))
 
     sock.send(sendbytes)
 
@@ -28,8 +26,7 @@ def txn_sync(sock, sendbytes):
     recvbytes = sock.recv(4096)
 
     # TODO - if verbose
-    recvhex = binascii.hexlify(recvbytes).decode('utf-8')
-    print("< {}".format(recvhex))
+    print("< {}".format(recvbytes.hex()))
 
     return recvbytes
 
