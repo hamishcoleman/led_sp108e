@@ -118,10 +118,11 @@ def assert_status_unknown(data):
 def test_frame():
     """Generate a single frame to send to the array"""
     maxlen = 60         # Number of pixels in frame
-    minlen1 = 38        # Last pixel with random color
-    offset = 35         # Cound of blank pixels at beginning of frame
+    minlen1 = 53        # Last pixel with random color
+    offset = 45         # Cound of blank pixels at beginning of frame
 
-    fill = bytes([0x11,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
+    # R G B followed by 12 unknown bytes
+    fill = bytes([0x11, 0x00, 0x00, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
     a = bytes(offset*15)
     while len(a) < minlen1*15:
@@ -146,6 +147,8 @@ def subc_testpreview(sock, args):
 
     for i in range(100):
         a = test_frame()
+        # TODO - split array up into bits that are MSS rounded down to nearest
+        # 15 byte boundary and try to solve the MTU issue
         txn_sync_expect(sock, a, b'\x31')
 
 

@@ -5,15 +5,29 @@ Grab images from the X11 display and send them to the SP108E LED controller.
 Currently a proof-of-concept toy
 
 TODO:
-- Handle TCP segmentation better
-- Determine how to handle larger displays
-- Handle serpentine LED layout
-- Map screen pixel colors to LED pixels RGB triplets
-- Understand why there are 15 bytes per pixel - can we compress the data?
-- Allow commandline config
-- Handle different size screengrabs
-- Allow different locations than 0,0
+- SP103E related
+    - Handle TCP segmentation better
+    - Determine how to handle larger displays
+    - Understand why there are 15 bytes per pixel - can we compress the data?
 
+- Rendering related
+    - Handle serpentine LED layout
+    - Allow arbitrary source-image to LED mappings
+    - Map screen pixel colors to LED pixels RGB triplets
+
+- need config options (commandline or config file)
+    - hostname / port
+    - Handle different size screengrabs
+    - Allow different grab locations than 0,0
+    - LED layout description
+
+A good test is with a video file:
+
+in one window:
+    mplayer -geometry 16x16+-6+-24 video.mpg
+
+in another window:
+    ./x11-to-led
 
  */
 
