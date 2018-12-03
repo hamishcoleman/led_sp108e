@@ -246,7 +246,9 @@ CMD_CUSTOM_PREVIEW:
 With a 60 pixel array attached, some trials were done.
 Frames full of random pixels were sent in rapid sequence
 
-Sending a frame with less than 192 triplets did not show proper animation.
+Sending a frame with a packet size of less than 192 triplets did not show
+proper animation.
+
 Sending 192 triplets showed 40 pixels animating
 Sending 197 triplets showed 41 pixels animating
 Sending 202 triplets showed 42 pixels animating
@@ -254,8 +256,21 @@ Sending 285 triplets showed 58 pixels animating
 Sending 290 triplets showed 59 pixels animating
 Sending 292 triplets showed 60 pixels animating
 
-pixels appear to be interleaved or similar.
-Pixel 1 is octets 0,1,2 - pixel 2 is octets 15,16,17
+
+With the observed frame packet size of 900 bytes there is room for
+300 pixels.  However, these are arranged differently depending on how
+many dots the controller has been configured to show.
+
+int per_frame = 900  /* bytes */
+int per_pixel = 3    /* bytes */
+
+bytes_per_slot = (per_frame/per_pixel) / displayed_pixels * per_pixel
+pixel_address[n] = bytes_per_slot * n
+
+Thus:
+-  3 displayed pixels: at 0, 300, 600
+-  4 displayed pixels: at 0, 225, 450, 675
+- 10 displayed pixesl: at 0, 90, 180, 270, 360, 450, 540, 630, 720, 810
 
 Note that the wifi device advertises an MTU of 576, however when sending
 the pixel data, this does not work properly.  Once the transmitted frame
