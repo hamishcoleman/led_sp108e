@@ -39,6 +39,7 @@ in another window:
 #include <sys/socket.h>
 #include <netinet/tcp.h>
 #include <netdb.h>
+#include <time.h>
 
 #include <X11/Xlib.h>
 
@@ -92,6 +93,9 @@ int main(int argc, char **argv) {
     int grab_height = 8;
     char frame[grab_height*grab_width*15]; /* raw frame storage */
 
+    time_t time_last = time(NULL);
+    int frames = 0;
+
     while(1) {
         XImage * xi = XGetImage(
             d, RootWindow(d, s),
@@ -138,6 +142,14 @@ int main(int argc, char **argv) {
         int size = recv(fd, buf, sizeof(buf), 0);
         /* TODO - confirm that we recv 0x31 */
 
+        frames++;
+        time_t time_now = time(NULL);
+        if (time_now > time_last) {
+            time_t deltat = time_now - time_last;
+            printf("FPS: %i\n", frames / deltat);
+            time_last = time_now;
+            frames = 0;
+        }
     }
 
     /* not reached */
