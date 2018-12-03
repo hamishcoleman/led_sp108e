@@ -115,38 +115,45 @@ def assert_status_unknown(data):
     assert data[15] == 0 # have also seen 0xff in this field # noqa
 
 
-def test_frame():
+def test_frame(dotcount, firstrandom, firstfill):
     """Generate a single frame to send to the array"""
-    maxlen = 60         # Number of pixels in frame
-    minlen1 = 53        # Last pixel with random color
-    offset = 45         # Cound of blank pixels at beginning of frame
+    maxlen = 900        # Number of bytes in a frame
+    stride = (maxlen // 3) // dotcount * 3
+
+    offset = firstrandom*stride   # address of first non blank pixel
+    minlen1 = firstfill*stride    # address of last pixel with random color
+
 
     # R G B followed by 12 unknown bytes
-    fill = bytes([0x11, 0x00, 0x00, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+    fill = bytearray([0x11, 0x00, 0x00])
 
-    a = bytes(offset*15)
-    while len(a) < minlen1*15:
-        a += bytes([
+    a = bytearray(maxlen)
+
+    while offset < minlen1:
+        a[offset:offset+3] = bytearray([
             random.randrange(256),
             random.randrange(256),
             random.randrange(256),
-            0, 0, 0,
-            0, 0, 0,
-            0, 0, 0,
-            0, 0, 0,
         ])
-    while len(a) < maxlen*15:
-        a += fill
+        offset+=stride
+
+    while offset < maxlen:
+        a[offset:offset+3] = fill
+        offset+=stride
 
     return a
 
 
 def subc_testpreview(sock, args):
     """Try to send video"""
+    dotcount = int(args.subc_args[0],0)
+    firstrandom = int(args.subc_args[1],0)
+    firstfill = int(args.subc_args[2],0)
+
     txn_sync_expect(sock, frame(0x24, None), b'\x31')
 
     for i in range(100):
-        a = test_frame()
+        a = test_frame(dotcount, firstrandom, firstfill)
         # TODO - split array up into bits that are MSS rounded down to nearest
         # 15 byte boundary and hope to solve the MTU issue
         txn_sync_expect(sock, a, b'\x31')
