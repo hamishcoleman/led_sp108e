@@ -14,8 +14,9 @@ On "add device"
         557 556 555 554 213 354 262
         557 556 555 554 279 342 256
 
-    looks like it could be an mtu scan, especially since the controllers
-    AP mode issues an MTU of 576
+    This looks like it might be some form of length-encoded data.  The length
+    can be seen without knowing the WPA PSK, so the controller could be using
+    that to configure its wifi credentials.
 
 - connects to TCP/8189
 
@@ -25,6 +26,32 @@ On "add device"
     < 01020304056d
     > 38d90fbd1083
     < 3801fc80ff0200320001ff00000300ff83
+
+The steps to successfully connect the LED controller to your wifi are
+both a somewhat fragile process and not fully spelt out in the existing
+documentation.  I have recorded a process that has worked for me below.
+Also be aware that the WIFI details are not permanently stored in the
+controller, so you will need to repeat the process each time you plug it
+in.
+
+Process to successfully "add device" to your Wifi:
+
+- Disconnect power to your wifi controller for at least 2 minutes
+- If the LEDShop app is running, kill it off
+- Copy your wifi PSK into your clipboard
+- Connect your phone to your wifi
+- Start the LEDShop app and let it complete its "scanning for LAN devices"
+- Select "Add device"
+- Paste your wifi PSK into the "password of wifi" box
+- Connect power to your wifi controller
+- Pause no more than 5 seconds
+- Click OK on the "password of wifi" box
+- wait for no more than 2 minutes (If you can check for new devices on your
+  WIFI, do that and watch for the LED controller to appear)
+- Hit the back button on the LEDShop app
+- "Pull down" the LEDShop list of devices, thus requesting it to do a scan
+  for network devices
+
 
 ---
 Some people on github have some hints:

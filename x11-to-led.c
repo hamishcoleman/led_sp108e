@@ -14,6 +14,7 @@ TODO:
     - Handle serpentine LED layout
     - Allow arbitrary source-image to LED mappings
     - Map screen pixel colors to LED pixels RGB triplets
+    - use XSHMGetImage for efficiency?
 
 - need config options (commandline or config file)
     - hostname / port

@@ -148,7 +148,7 @@ def subc_testpreview(sock, args):
     for i in range(100):
         a = test_frame()
         # TODO - split array up into bits that are MSS rounded down to nearest
-        # 15 byte boundary and try to solve the MTU issue
+        # 15 byte boundary and hope to solve the MTU issue
         txn_sync_expect(sock, a, b'\x31')
 
 
