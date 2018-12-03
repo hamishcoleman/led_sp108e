@@ -8,7 +8,6 @@ TODO:
 - SP103E related
     - Handle TCP segmentation better
     - Determine how to handle larger displays
-    - Understand why there are 15 bytes per pixel - can we compress the data?
 
 - Rendering related
     - Handle serpentine LED layout
@@ -89,9 +88,11 @@ int main(int argc, char **argv) {
     int size = recv(fd, buf, sizeof(buf), 0);
     /* TODO - confirm that we recv 0x31 */
 
-    int grab_width = 8;
-    int grab_height = 8;
-    char frame[grab_height*grab_width*15]; /* raw frame storage */
+    int grab_width = 16;
+    int grab_height = 16;
+    int pixels = grab_width*grab_height;
+    char frame[900]; /* raw frame storage */
+    int stride = sizeof(frame) / 3 / pixels * 3;
 
     time_t time_last = time(NULL);
     int frames = 0;
@@ -125,17 +126,17 @@ int main(int argc, char **argv) {
         char *dst = frame;
         int pix;
 
-        for(pix=0; pix<60; pix++) {
+        for(pix=0; pix<pixels; pix++) {
             /* TODO - this should not be hardcoded */
             char blue  = *src++;
             char green = *src++;
             char red   = *src++;
             src++; // 32 bits per pixel
 
-            *dst++ = red;
-            *dst++ = green;
-            *dst++ = blue;
-            dst+=12;
+            *(dst+0) = red;
+            *(dst+1) = green;
+            *(dst+2) = blue;
+            dst+=stride;
         }
 
         send(fd, frame, sizeof(frame), 0);
