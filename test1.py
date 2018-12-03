@@ -122,7 +122,7 @@ def test_frame(dotcount, firstrandom, firstfill):
 
     offset = firstrandom*stride   # address of first non blank pixel
     minlen1 = firstfill*stride    # address of last pixel with random color
-
+    maxdots = dotcount*stride     # address of first non displayed pixel
 
     # R G B followed by 12 unknown bytes
     fill = bytearray([0x11, 0x00, 0x00])
@@ -137,7 +137,7 @@ def test_frame(dotcount, firstrandom, firstfill):
         ])
         offset+=stride
 
-    while offset < maxlen:
+    while offset < maxdots:
         a[offset:offset+3] = fill
         offset+=stride
 
