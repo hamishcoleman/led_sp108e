@@ -10,7 +10,7 @@ TODO:
     - Determine how to handle larger displays
 
 - Rendering related
-    - Handle serpentine LED layout
+    - Allow switching on and off the serpentine LED layout
     - Allow arbitrary source-image to LED mappings
     - Map screen pixel colors to LED pixels RGB triplets
     - use XSHMGetImage for efficiency?
@@ -24,7 +24,11 @@ TODO:
 A good test is with a video file:
 
 in one window:
+    # for an 8x8 grab
     mplayer -geometry 16x16+-6+-24 video.mpg
+
+    # for a 16x16 grab
+    mplayer -geometry 26x23+-6+-24 video.mpg
 
 in another window:
     ./x11-to-led
@@ -126,17 +130,42 @@ int main(int argc, char **argv) {
         char *dst = frame;
         int pix;
 
-        for(pix=0; pix<pixels; pix++) {
-            /* TODO - this should not be hardcoded */
-            char blue  = *src++;
-            char green = *src++;
-            char red   = *src++;
-            src++; // 32 bits per pixel
+        for(int pairs = 0; pairs < grab_height/2; pairs++) {
+            /* each pair has one Left to Right and one Right to Left row */
 
-            *(dst+0) = red;
-            *(dst+1) = green;
-            *(dst+2) = blue;
-            dst+=stride;
+            /* R to L */
+            src += (4*grab_width);
+            char * saved_src = src;
+
+            src --;
+            for(int x=grab_width; x>0; x--) {
+                /* TODO - this should not be hardcoded */
+                src--; // 32 bits per pixel
+                char red   = *src--;
+                char green = *src--;
+                char blue  = *src--;
+
+                *(dst+0) = red;
+                *(dst+1) = green;
+                *(dst+2) = blue;
+                dst+=stride;
+            }
+            src = saved_src;
+
+            /* L to R */
+            for(int x=0; x<grab_width; x++) {
+                /* TODO - this should not be hardcoded */
+                char blue  = *src++;
+                char green = *src++;
+                char red   = *src++;
+                src++; // 32 bits per pixel
+
+                *(dst+0) = red;
+                *(dst+1) = green;
+                *(dst+2) = blue;
+                dst+=stride;
+            }
+
         }
 
         send(fd, frame, sizeof(frame), 0);
