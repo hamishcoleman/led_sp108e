@@ -12,11 +12,16 @@ import pcap
 pc = pcap.pcap(sys.argv[1])
 pc.setfilter('udp port 7001')
 
+verbose = False
+
 sync_prev = None # track the most recent sync value
 
 data_set = None   # track the ip_dest for the current group
-data1_prev = None # track the first in each group of three
-data2_prev = None # track the second in each group of three
+data1_curr = None # track the first in each group of three
+data2_index = None # track the second in each group of three
+data_index_prev = None # track the counter
+
+data = {}
 
 time_first = None
 for timestamp, packet in pc:
@@ -47,9 +52,11 @@ for timestamp, packet in pc:
 
         if data_len == 0x200:
             # the final in a sync set
-            print("{:.3f} {:02x} {:03x} SYNC end".format(
-                time_delta, ip_dest, data_len,
-            ))
+
+            if verbose:
+                print("{:.3f} {:02x} {:03x} SYNC end".format(
+                    time_delta, ip_dest, data_len,
+                ))
             sync_prev = None
             continue
 
@@ -68,7 +75,7 @@ for timestamp, packet in pc:
         # a fresh set of three values is arriving
 
         data_set = ip_dest
-        data1_prev = data_len
+        data1_curr = data_len
         continue
 
     if data_set is not None:
@@ -82,25 +89,57 @@ for timestamp, packet in pc:
             data_set = None
             continue
 
-        if data2_prev is None:
-            data2_prev = data_len
+        if data2_index is None:
+            data2_index = data_len
             continue
 
-        print("{:.3f} {:02x} -1 TRIPLE {:03x}  {:03x} {:03x} {:010b} {:010b}".format(
-            time_delta, data_set,
-            data2_prev, # looks like a data counter
-            data1_prev,
-            data_len,
-            data1_prev,
-            data_len,
-        ))
+        if data_index_prev is not None and data2_index != data_index_prev+1:
+            data_index_prev = None
+
+            if data2_index != 0x128:
+                # only show error if it is not a restart
+                print("{:.3f} {:02x} {:03x} TRIPLE bad counter".format(
+                    time_delta, data_set,
+                    data2_index,
+                ))
+
+        if verbose:
+            print("{:.3f} {:02x} -1 TRIPLE {:03x}  {:03x} {:03x} {:010b} {:010b}".format(
+                time_delta, data_set,
+                data2_index, # looks like a data counter
+                data1_curr,
+                data_len,
+                data1_curr,
+                data_len,
+            ))
+
+        if data2_index in data:
+            # confirm that the data has not changed
+            if data1_curr != data[data2_index][0] or data_len != data[data2_index][1]:
+                print("{:.3f} {:02x} -1 DATA mismatch".format(
+                    time_delta, data_set,
+                ))
+        else:
+            data[data2_index] = list([data1_curr, data_len])
+
+        # save the counter
+        data_index_prev = data2_index
 
         data_set = None
-        data1_prev = None
-        data2_prev = None
+        data1_curr = None
+        data2_index = None
         continue
 
     print("{:.3f} {:02x} {:03x} UNK {:010b}".format(
         time_delta, ip_dest,
         data_len, data_len,
+    ))
+
+print("\n")
+print("DATA")
+for i in sorted(data.keys()):
+    print("{:03x}  {:03x} {:03x} {:010b} {:010b}".format(
+        i,
+        data[i][0], data[i][1],
+        data[i][0], data[i][1],
     ))
