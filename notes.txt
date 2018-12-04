@@ -5,18 +5,7 @@ On startup
 - connects to TCP/7 , but doesnt send any traffic if connection accepted
 
 On "add device"
-- UI asks for the wifi password
-- sends to 234.1.1.1 UDP/7001 various sized packets filled with ascii "1"
-
-    sizes:
-        557 556 555 554 245 352 132
-        557 556 555 554 285 340 218
-        557 556 555 554 213 354 262
-        557 556 555 554 279 342 256
-
-    This looks like it might be some form of length-encoded data.  The length
-    can be seen without knowing the WPA PSK, so the controller could be using
-    that to configure its wifi credentials.
+- Sends an encoded set of packets with config data (See section below)
 
 - connects to TCP/8189
 
@@ -281,3 +270,55 @@ Android ignores the MTU offered by the device, so we can do that too (for
 testing at least) with the following command:
 
     sudo ip route add 192.168.4.1 dev wlan0 mtu 1500
+
+---
+WIFI configure
+
+The app sends multicast UDP packets, with the packet length encoding the data
+to be sent.  This is done because a device with no wifi credentials can still
+sniff the size of packets, even if the data is encrypted
+
+SYNC_BURST
+    Simple signal for the reciever to use to synchronise to the
+    transmission.
+
+    Consists of multiple groups of packets, all following the pattern:
+        0x203
+        0x202
+        0x201
+        0x200
+
+DATA_BYTES
+    Data appears to come in groups of three.  Each group has a data
+    counter byte as the second in the group.  This byte starts at 0x128
+    and increases for each new data item.
+
+    The data bytes will be repeated multiple times during the config
+    burst and the counter can be used to fill in any missing bytes.
+
+    The data bytes are decoded with some bit fiddling to produce the
+    final config packet
+
+    guess = (
+        (d2 & 0x7) |
+        (~d2 & 8) |
+        (d0 & 7) <<4 |
+        (~d0 & 8) <<4
+    )
+
+CONFIG PACKET
+
+An example packet is shown below:
+
+H: 000: 1b 0c 29 16 af c0 a8 01 bf 61 61 61 61 62 62 62 |..)......aaaabbb|
+H: 010: 62 63 63 63 63 5a 5a 5a 5a 5a 5a                |bccccZZZZZZ|
+
+    char len_total;
+    char len_psk;
+    char unk[7];
+    char psk[];
+    char ssid[];
+
+The decoding I have currently guessed breaks down for a psk with spaces in
+them.  The unknown bytes also change in ways that look wrong in various
+packets, so there is probably still some missing steps.
