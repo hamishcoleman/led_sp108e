@@ -9,6 +9,31 @@
 import sys
 import pcap
 
+def hexdump(buf):
+    """Takes bytes and does a standard hexdump"""
+
+    r = ""
+    addr = 0
+    hexdigits = ""
+    strdigits = ""
+
+    for b in buf:
+        hexdigits += "{:02x} ".format(b)
+        if b >= 0x20 and b <=0x7e:
+            strdigits += chr(b)
+        else:
+            strdigits += '.'
+
+        if addr % 16 == 15:
+            r += "H: {:03x}: {:48}|{}|\n".format(addr-15, hexdigits, strdigits)
+            hexdigits = ""
+            strdigits = ""
+        addr += 1
+
+    if len(strdigits):
+        r += "H: {:03x}: {:48}|{}|\n".format(addr-len(strdigits), hexdigits, strdigits)
+    return r
+
 pc = pcap.pcap(sys.argv[1])
 pc.setfilter('udp port 7001')
 
@@ -137,9 +162,28 @@ for timestamp, packet in pc:
 
 print("\n")
 print("DATA")
+packet = bytes()
 for i in sorted(data.keys()):
-    print("{:03x}  {:03x} {:03x} {:010b} {:010b}".format(
-        i,
-        data[i][0], data[i][1],
-        data[i][0], data[i][1],
+    d0 = data[i][0]
+    d2 = data[i][1]
+
+    # TODO
+    # - This guess does not work for a PSK with spaces in it
+    # - some of the packet contents appear to be changing in unexpected ways
+    guess = (
+        (d2 & 0x7) |
+        (~d2 & 8) |
+        (d0 & 7) <<4 |
+        (~d0 & 8) <<4
+    )
+
+    print("{:03x} {:03x} {:03x} : {:010b} {:010b} {:010b} : {:03x}".format(
+        d0, i, d2,
+        d0, i, d2,
+        guess
     ))
+
+    packet += bytes([guess])
+
+print("")
+print(hexdump(packet))
