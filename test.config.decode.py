@@ -17,20 +17,8 @@ for timestamp, packet in pc:
         time_first = timestamp
 
     time_delta = timestamp - time_first
-    ip_dest = packet[0x21]
-    data_len = len(packet) - 42;
-
-    # ip_id = packet[18:20]
-    # ip_checksum = packet[0x18:0x1a]
-    # udp_checksum = packet[0x28:0x2a]
-    # print("{:.3f} {:02x} {:04x} {:04x} {:04x} {:03x}".format(
-    #     time_delta,
-    #     ip_dest,
-    #     ip_id[0]*0x100 + ip_id[1],
-    #     ip_checksum[0]*0x100 + ip_checksum[1],
-    #     udp_checksum[0]*0x100 + udp_checksum[1],
-    #     data_len,
-    # ))
+    ip_dest = packet[0x21]        # track the groups the app thinks it is sending
+    data_len = len(packet) - 42;  # this ends up being the signal data
 
     if data_len > 0x1ff:
         # This looks like part of a sync
