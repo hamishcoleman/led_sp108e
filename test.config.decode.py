@@ -2,6 +2,9 @@
 #
 # Look at a packet capture of the app sending the WIFI configuration and try
 # to decode what is actually going on
+#
+# Create these captures by running tcpdump on the phone before using the
+# "add device" option in the app
 
 import sys
 import pcap
@@ -9,7 +12,11 @@ import pcap
 pc = pcap.pcap(sys.argv[1])
 pc.setfilter('udp port 7001')
 
-sync_prev = None
+sync_prev = None # track the most recent sync value
+
+data_set = None   # track the ip_dest for the current group
+data1_prev = None # track the first in each group of three
+data2_prev = None # track the second in each group of three
 
 time_first = None
 for timestamp, packet in pc:
@@ -57,9 +64,41 @@ for timestamp, packet in pc:
         ))
         sync_prev = None
  
+    if data_set is None:
+        # a fresh set of three values is arriving
 
-    # clear the sync info
-    sync_prev = None
+        data_set = ip_dest
+        data1_prev = data_len
+        continue
+
+    if data_set is not None:
+        # we expect this to be a continuation of a previous triplet
+
+        if data_set != ip_dest:
+            print("{:.3f} {:02x} {:03x} TRIPLE bad".format(
+                time_delta, ip_dest, data_len,
+            ))
+
+            data_set = None
+            continue
+
+        if data2_prev is None:
+            data2_prev = data_len
+            continue
+
+        print("{:.3f} {:02x} -1 TRIPLE {:03x}  {:03x} {:03x} {:010b} {:010b}".format(
+            time_delta, data_set,
+            data2_prev, # looks like a data counter
+            data1_prev,
+            data_len,
+            data1_prev,
+            data_len,
+        ))
+
+        data_set = None
+        data1_prev = None
+        data2_prev = None
+        continue
 
     print("{:.3f} {:02x} {:03x} UNK {:010b}".format(
         time_delta, ip_dest,
