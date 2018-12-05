@@ -9,6 +9,7 @@
 import sys
 import pcap
 
+
 def hexdump(buf):
     """Takes bytes and does a standard hexdump"""
 
@@ -19,7 +20,7 @@ def hexdump(buf):
 
     for b in buf:
         hexdigits += "{:02x} ".format(b)
-        if b >= 0x20 and b <=0x7e:
+        if b >= 0x20 and b <= 0x7e:
             strdigits += chr(b)
         else:
             strdigits += '.'
@@ -31,20 +32,25 @@ def hexdump(buf):
         addr += 1
 
     if len(strdigits):
-        r += "H: {:03x}: {:48}|{}|\n".format(addr-len(strdigits), hexdigits, strdigits)
+        r += "H: {:03x}: {:48}|{}|\n".format(
+            addr-len(strdigits),
+            hexdigits,
+            strdigits
+        )
     return r
+
 
 pc = pcap.pcap(sys.argv[1])
 pc.setfilter('udp port 7001')
 
 verbose = False
 
-sync_prev = None # track the most recent sync value
+sync_prev = None        # track the most recent sync value
 
-data_set = None   # track the ip_dest for the current group
-data1_curr = None # track the first in each group of three
-data2_index = None # track the second in each group of three
-data_index_prev = None # track the counter
+data_set = None         # track the ip_dest for the current group
+data1_curr = None       # track the first in each group of three
+data2_index = None      # track the second in each group of three
+data_index_prev = None  # track the counter
 
 data = {}
 
@@ -54,8 +60,8 @@ for timestamp, packet in pc:
         time_first = timestamp
 
     time_delta = timestamp - time_first
-    ip_dest = packet[0x21]        # track the groups the app thinks it is sending
-    data_len = len(packet) - 42;  # this ends up being the signal data
+    ip_dest = packet[0x21]        # essentially the triplet identifier
+    data_len = len(packet) - 42   # this ends up being the signal data
 
     if data_len > 0x1ff:
         # This looks like part of a sync
@@ -95,7 +101,7 @@ for timestamp, packet in pc:
             time_delta,
         ))
         sync_prev = None
- 
+
     if data_set is None:
         # a fresh set of three values is arriving
 
@@ -129,9 +135,9 @@ for timestamp, packet in pc:
                 ))
 
         if verbose:
-            print("{:.3f} {:02x} -1 TRIPLE {:03x}  {:03x} {:03x} {:010b} {:010b}".format(
+            print("{:.3f} {:02x} -1 TRIPLE {:03x}  {:03x} {:03x} {:010b} {:010b}".format( # noqa
                 time_delta, data_set,
-                data2_index, # looks like a data counter
+                data2_index,
                 data1_curr,
                 data_len,
                 data1_curr,
@@ -140,7 +146,8 @@ for timestamp, packet in pc:
 
         if data2_index in data:
             # confirm that the data has not changed
-            if data1_curr != data[data2_index][0] or data_len != data[data2_index][1]:
+            if (data1_curr != data[data2_index][0] or
+               data_len != data[data2_index][1]):
                 print("{:.3f} {:02x} -1 DATA mismatch".format(
                     time_delta, data_set,
                 ))
@@ -173,8 +180,8 @@ for i in sorted(data.keys()):
     guess = (
         (d2 & 0x7) |
         (~d2 & 8) |
-        (d0 & 7) <<4 |
-        (~d0 & 8) <<4
+        (d0 & 7) << 4 |
+        (~d0 & 8) << 4
     )
 
     print("{:03x} {:03x} {:03x} : {:010b} {:010b} {:010b} : {:03x}".format(

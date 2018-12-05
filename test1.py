@@ -135,20 +135,20 @@ def test_frame(dotcount, firstrandom, firstfill):
             random.randrange(256),
             random.randrange(256),
         ])
-        offset+=stride
+        offset += stride
 
     while offset < maxdots:
         a[offset:offset+3] = fill
-        offset+=stride
+        offset += stride
 
     return a
 
 
 def subc_testpreview(sock, args):
     """Try to send video"""
-    dotcount = int(args.subc_args[0],0)
-    firstrandom = int(args.subc_args[1],0)
-    firstfill = int(args.subc_args[2],0)
+    dotcount = int(args.subc_args[0], 0)
+    firstrandom = int(args.subc_args[1], 0)
+    firstfill = int(args.subc_args[2], 0)
 
     txn_sync_expect(sock, frame(0x24, None), b'\x31')
 
