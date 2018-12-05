@@ -19,9 +19,10 @@ On "add device"
 The steps to successfully connect the LED controller to your wifi are
 both a somewhat fragile process and not fully spelt out in the existing
 documentation.  I have recorded a process that has worked for me below.
-Also be aware that the WIFI details are not permanently stored in the
-controller, so you will need to repeat the process each time you plug it
-in.
+
+Also be aware that the WIFI details are not sometimes not permanently
+stored in the controller, so you may need to repeat the process each
+time you plug it in.
 
 Process to successfully "add device" to your Wifi:
 
