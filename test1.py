@@ -48,24 +48,12 @@ def cmd_sync(sock):
     return txn_sync(sock, cmd.frame(cmd.CMD_SYNC, None))
 
 
-def cmd_get_device_name(sock):
-    r = txn_sync(sock, cmd.frame(cmd.CMD_GET_DEVICE_NAME, None))
-    # FIXME - first char is a null - check and remove
-    return r.decode('utf-8')
-
-
 def cmd_check_device(sock, challenge):
     """Send a check packet, and confirm the result is sane"""
     if challenge is None:
-        challenge = 0x73a52b # chosen by a fair dice roll # noqa
+        challenge = 0x73a52b  # chosen by a fair dice roll
 
-    data = bytes([
-        challenge % 256,
-        challenge // 256 % 256,
-        challenge // 256 // 256 % 256,
-    ])
-
-    r = txn_sync(sock, cmd.frame(cmd.CMD_CHECK_DEVICE, data))
+    r = txn_sync(sock, cmd.check_device(challenge))
 
     assert r[0] == 1
     assert r[1] == 2
@@ -169,7 +157,9 @@ def subc_check_device(sock, args):
 
 def subc_get_device_name(sock, args):
     """Request device name"""
-    print("Connected to {}".format(cmd_get_device_name(sock)))
+    name = txn_sync(sock, cmd.get_device_name()).decode('utf8')
+    # FIXME - first char is a null - check and remove
+    print("Connected to {}".format(name))
 
 
 def subc_speed(sock, args):

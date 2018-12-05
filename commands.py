@@ -31,6 +31,8 @@ CMD_CHECK_DEVICE = 0xd5
 
 # if we know this command, record if we expect a response
 response = {
+    CMD_CHECK_DEVICE: True,
+    CMD_GET_DEVICE_NAME: True,
     CMD_SPEED: False,
 }
 
@@ -53,3 +55,13 @@ def frame(cmd, data):
 def speed(speed):
     """Set the speed of the programmed effect"""
     return frame(CMD_SPEED, bytes([speed]))
+
+
+def get_device_name():
+    """Request the current device name"""
+    return frame(CMD_GET_DEVICE_NAME, None)
+
+
+def check_device(challenge):
+    """Request a device check"""
+    return frame(CMD_CHECK_DEVICE, challenge.to_bytes(3, 'little'))

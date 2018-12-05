@@ -14,3 +14,14 @@ def test_frame():
 
 def test_speed():
     assert b'\x38\x64\x00\x00\x03\x83' == commands.speed(100)
+
+
+def test_get_device_name():
+    assert b'\x38\x00\x00\x00\x77\x83' == commands.get_device_name()
+
+
+def test_check_device():
+    with pytest.raises(AttributeError):
+        commands.check_device(None)
+
+    assert b'\x38\x30\x20\x10\xd5\x83' == commands.check_device(0x102030)
