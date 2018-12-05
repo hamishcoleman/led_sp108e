@@ -8,7 +8,7 @@ import argparse
 import socket
 import random
 
-import commands
+import commands as cmd
 
 
 def txn(sock, sendbytes):
@@ -44,26 +44,16 @@ def txn_sync_expect(sock, sendbytes, expectbytes):
     return r
 
 
-def frame(cmd, data):
-    """ Add the framing bytes """
-    if data is None:
-        data = b'\x00\x00\x00'
-
-    packet = b'\x38' + data + bytes([cmd]) + b'\x83'
-    assert(len(packet) == 6)
-    return packet
-
-
 def cmd_speed(sock, speed):
-    return txn(sock, frame(commands.CMD_SPEED, bytes([speed]) + b'\x00\x00'))
+    return txn(sock, cmd.frame(cmd.CMD_SPEED, bytes([speed]) + b'\x00\x00'))
 
 
 def cmd_sync(sock):
-    return txn_sync(sock, frame(commands.CMD_SYNC, None))
+    return txn_sync(sock, cmd.frame(cmd.CMD_SYNC, None))
 
 
 def cmd_get_device_name(sock):
-    r = txn_sync(sock, frame(commands.CMD_GET_DEVICE_NAME, None))
+    r = txn_sync(sock, cmd.frame(cmd.CMD_GET_DEVICE_NAME, None))
     # FIXME - first char is a null - check and remove
     return r.decode('utf-8')
 
@@ -79,7 +69,7 @@ def cmd_check_device(sock, challenge):
         challenge // 256 // 256 % 256,
     ])
 
-    r = txn_sync(sock, frame(commands.CMD_CHECK_DEVICE, data))
+    r = txn_sync(sock, cmd.frame(cmd.CMD_CHECK_DEVICE, data))
 
     assert r[0] == 1
     assert r[1] == 2
@@ -156,7 +146,7 @@ def subc_testpreview(sock, args):
     firstrandom = int(args.subc_args[1], 0)
     firstfill = int(args.subc_args[2], 0)
 
-    txn_sync_expect(sock, frame(commands.CMD_CUSTOM_PREVIEW, None), b'\x31')
+    txn_sync_expect(sock, cmd.frame(cmd.CMD_CUSTOM_PREVIEW, None), b'\x31')
 
     for i in range(100):
         a = test_frame(dotcount, firstrandom, firstfill)
@@ -235,7 +225,7 @@ def subc_testcmd(sock, args):
     assert (len(args.subc_args) > 0), "testcmd takes at least 1 arg"
     assert (len(args.subc_args) < 5), "testcmd takes at most 4 args"
 
-    cmd = int(args.subc_args[0], 0)
+    cmdnr = int(args.subc_args[0], 0)
 
     if len(args.subc_args) > 1:
         data1 = int(args.subc_args[1], 0)
@@ -252,9 +242,9 @@ def subc_testcmd(sock, args):
     else:
         data3 = 0
 
-    txn(sock, frame(cmd, bytes([data1, data2, data3])))
+    txn(sock, cmd.frame(cmdnr, bytes([data1, data2, data3])))
 
-    if cmd not in commands.response or commands.response[cmd]:
+    if cmdnr not in cmd.response or cmd.response[cmdnr]:
         # either we dont know if it responds, so we always listen
         # or we know for sure it has a response, so we listen
         rxn(sock)

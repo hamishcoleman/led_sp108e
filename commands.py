@@ -33,3 +33,17 @@ CMD_CHECK_DEVICE = 0xd5
 response = {
     CMD_SPEED: False,
 }
+
+CMD_FRAME_START = 0x38
+CMD_FRAME_END = 0x83
+
+
+def frame(cmd, data):
+    """Return the bytes needed for this command packet"""
+    if data is None:
+        data = b'\x00\x00\x00'
+
+    if len(data) != 3:
+        raise ValueError("data length must be 3")
+
+    return bytes([CMD_FRAME_START]) + data + bytes([cmd, CMD_FRAME_END])
