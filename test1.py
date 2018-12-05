@@ -8,6 +8,8 @@ import argparse
 import socket
 import random
 
+import commands
+
 
 def txn(sock, sendbytes):
     """ Perform a tx transaction """
@@ -49,15 +51,15 @@ def frame(cmd, data):
 
 
 def cmd_speed(sock, speed):
-    return txn(sock, frame(0x03, bytes([speed]) + b'\x00\x00'))
+    return txn(sock, frame(commands.CMD_SPEED, bytes([speed]) + b'\x00\x00'))
 
 
 def cmd_sync(sock):
-    return txn_sync(sock, frame(0x10, None))
+    return txn_sync(sock, frame(commands.CMD_SYNC, None))
 
 
 def cmd_get_device_name(sock):
-    r = txn_sync(sock, frame(0x77, None))
+    r = txn_sync(sock, frame(commands.CMD_GET_DEVICE_NAME, None))
     # FIXME - first char is a null - check and remove
     return r.decode('utf-8')
 
@@ -73,7 +75,7 @@ def cmd_check_device(sock, challenge):
         challenge // 256 // 256 % 256,
     ])
 
-    r = txn_sync(sock, frame(0xd5, data))
+    r = txn_sync(sock, frame(commands.CMD_CHECK_DEVICE, data))
 
     assert r[0] == 1
     assert r[1] == 2
@@ -150,7 +152,7 @@ def subc_testpreview(sock, args):
     firstrandom = int(args.subc_args[1], 0)
     firstfill = int(args.subc_args[2], 0)
 
-    txn_sync_expect(sock, frame(0x24, None), b'\x31')
+    txn_sync_expect(sock, frame(commands.CMD_CUSTOM_PREVIEW, None), b'\x31')
 
     for i in range(100):
         a = test_frame(dotcount, firstrandom, firstfill)
