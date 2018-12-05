@@ -258,7 +258,9 @@ def subc_testcmd(sock, args):
         # either we dont know if it responds, so we always listen
         # or we know for sure it has a response, so we listen
         rxn(sock)
-
+    else:
+        # Ensure we keep in sync by sending a quick check
+        cmd_check_device(sock, None)
 
 # A list of all the sub-commands
 subc_cmds = {
