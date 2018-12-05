@@ -45,7 +45,7 @@ def txn_sync_expect(sock, sendbytes, expectbytes):
 
 
 def cmd_speed(sock, speed):
-    return txn(sock, cmd.frame(cmd.CMD_SPEED, bytes([speed]) + b'\x00\x00'))
+    return txn(sock, cmd.frame(cmd.CMD_SPEED, bytes([speed])))
 
 
 def cmd_sync(sock):
