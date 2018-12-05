@@ -140,13 +140,13 @@ Tested commands:
 0x00:           no response
 0x01:           no response
 0x02:           CMD_CUSTOM_EFFECT, sets all white, data appears to do something
-0x03:           commands.speed()
+0x03:           commands.speed(speed)
 0x04:           no response
 0x05:           no response
-0x06:           CMD_MODE_AUTO, data appears to be ignored
+0x06:           commands.mode_change(0xfc)
 0x07:           CMD_CUSTOM_DELETE, returns 0x31, sets modenr 0
 0x08 - 0x0f:    no response
-0x10:           CMD_SYNC, returns state, data appears to be ignored
+0x10:           commands.sync()
                     [0] = 0x38
                     [1] = display on/off
                     [2] = modenr or 0xfc for AUTO
@@ -161,7 +161,8 @@ Tested commands:
 0x15:           no response
 0x16:           CMD_SET_DEVICE_PASSWORD untested
 0x17 - 0x1b:    no response
-0x1c:           CMD_SET_IC_MODEL data1 is chip type 0-0x1c
+0x1c:           commands.set_ic_model(model)
+                data1 is chip type 0-0x1c
 0x1d - 0x1f:    no response
 0x20:           CMD_GET_RECORD_NUM, returns 0x00, data appears to be ignored
 0x21:           no response
@@ -175,7 +176,7 @@ Tested commands:
 0x26 - 0x29:    no response
 0x2a:           CMD_BRIGHTNESS, data1 is brightness <2 = off
 0x2b:           no response
-0x2c:           CMD_MODE_CHANGE
+0x2c:           commands.mode_change(mode)
                     data1 is mode
                         patterns 0-179
                         simple 205-212

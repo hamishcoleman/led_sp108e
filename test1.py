@@ -44,10 +44,6 @@ def txn_sync_expect(sock, sendbytes, expectbytes):
     return r
 
 
-def cmd_sync(sock):
-    return txn_sync(sock, cmd.frame(cmd.CMD_SYNC, None))
-
-
 def cmd_check_device(sock, challenge):
     """Send a check packet, and confirm the result is sane"""
     if challenge is None:
@@ -162,6 +158,18 @@ def subc_get_device_name(sock, args):
     print("Connected to {}".format(name))
 
 
+def subc_mode_change(sock, args):
+    assert (len(args.subc_args) == 1), "command takes 1 arg"
+    mode = int(args.subc_args[0], 0)
+    txn(sock, cmd.mode_change(mode))
+
+
+def subc_set_ic_model(sock, args):
+    assert (len(args.subc_args) == 1), "command takes 1 arg"
+    model = int(args.subc_args[0], 0)
+    txn(sock, cmd.set_ic_model(model))
+
+
 def subc_speed(sock, args):
     """Set automatic sequence display speed"""
     assert (len(args.subc_args) == 1), "speed command takes 1 arg"
@@ -172,7 +180,8 @@ def subc_speed(sock, args):
 
 def subc_status(sock, args):
     """Request device status"""
-    state = cmd_sync(sock)
+
+    state = txn_sync(sock, cmd.sync())
     assert_frame(state)
 
     modenames = {
@@ -243,6 +252,8 @@ def subc_testcmd(sock, args):
 subc_cmds = {
     'check_device':     subc_check_device,
     'get_device_name':  subc_get_device_name,
+    'mode_change':      subc_mode_change,
+    'set_ic_model':     subc_set_ic_model,
     'speed':   subc_speed,
     'status':  subc_status,
     'testcmd': subc_testcmd,

@@ -33,11 +33,32 @@ CMD_CHECK_DEVICE = 0xd5
 response = {
     CMD_CHECK_DEVICE: True,
     CMD_GET_DEVICE_NAME: True,
+    CMD_MODE_AUTO: False,
+    CMD_MODE_CHANGE: False,
+    CMD_SET_IC_MODEL: False,
     CMD_SPEED: False,
+    CMD_SYNC: True,
 }
 
 CMD_FRAME_START = 0x38
 CMD_FRAME_END = 0x83
+
+# These modes all have a single color, set by CMD_COLOR
+MODE_METEOR = 205
+MODE_BREATHING = 206
+MODE_STACK = 207
+MODE_FLOW = 208
+MODE_WAVE = 209
+MODE_FLASH = 210
+MODE_STATIC = 211
+MODE_CATCHUP = 212
+MODE_CUSTOM_EFFECT = 219
+
+# Auto sequence through all the multi-color modes
+MODE_AUTO = 0xfc
+
+# TODO
+#IC_MODEL_xxx = yyy # noqa
 
 
 def frame(cmd, data):
@@ -65,3 +86,28 @@ def get_device_name():
 def check_device(challenge):
     """Request a device check"""
     return frame(CMD_CHECK_DEVICE, challenge.to_bytes(3, 'little'))
+
+
+def mode_change(mode):
+    """Request a display pattern mode change"""
+    # I dont know why they didnt let you simply MODE_CHANGE to MODE_AUTO
+    if mode == MODE_AUTO:
+        return frame(CMD_MODE_AUTO, None)
+
+    # TODO
+    # - the screen freezes when given an invalid mode, maybe validate here?
+
+    return frame(CMD_MODE_CHANGE, bytes([mode]))
+
+
+def sync():
+    """Request a status response"""
+    return frame(CMD_SYNC, None)
+
+
+def set_ic_model(model):
+    """Set which LED protocol is needed"""
+    # TODO
+    # - the screen freezes when given an invalid model, maybe validate here?
+
+    return frame(CMD_SET_IC_MODEL, bytes([model]))

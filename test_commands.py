@@ -25,3 +25,19 @@ def test_check_device():
         commands.check_device(None)
 
     assert b'\x38\x30\x20\x10\xd5\x83' == commands.check_device(0x102030)
+
+
+def test_mode_change():
+    assert b'\x38\x00\x00\x00\x06\x83' \
+        == commands.mode_change(commands.MODE_AUTO)
+
+    assert b'\x38\xcd\x00\x00\x2c\x83' \
+        == commands.mode_change(commands.MODE_METEOR)
+
+
+def test_sync():
+    assert b'\x38\x00\x00\x00\x10\x83' == commands.sync()
+
+
+def test_set_ic_model():
+    assert b'\x38\x1d\x00\x00\x1c\x83' == commands.set_ic_model(0x1d)
