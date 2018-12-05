@@ -7,7 +7,9 @@ Currently a proof-of-concept toy
 TODO:
 - SP103E related
     - Handle TCP segmentation better
-    - Determine how to handle larger displays
+    - it seems that the max number of pixels is 300
+        - after this I see LED state corruption
+        - investigate further
 
 - Rendering related
     - Allow switching on and off the serpentine LED layout

@@ -32,6 +32,7 @@ CMD_CHECK_DEVICE = 0xd5
 # if we know this command, record if we expect a response
 response = {
     CMD_CHECK_DEVICE: True,
+    CMD_COLOR: False,
     CMD_GET_DEVICE_NAME: True,
     CMD_MODE_AUTO: False,
     CMD_MODE_CHANGE: False,
@@ -111,3 +112,8 @@ def set_ic_model(model):
     # - the screen freezes when given an invalid model, maybe validate here?
 
     return frame(CMD_SET_IC_MODEL, bytes([model]))
+
+
+def color(rgb):
+    """Set the color to be used for the single-color patterns"""
+    return frame(CMD_COLOR, rgb.bytes)

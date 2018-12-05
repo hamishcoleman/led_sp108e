@@ -1,5 +1,6 @@
 import pytest
 import commands
+import structures
 
 
 def test_frame():
@@ -41,3 +42,8 @@ def test_sync():
 
 def test_set_ic_model():
     assert b'\x38\x1d\x00\x00\x1c\x83' == commands.set_ic_model(0x1d)
+
+
+def test_color():
+    rgb = structures.RGB(0x10, 0x20, 0x30)
+    assert b'\x38\x10\x20\x30\x22\x83' == commands.color(rgb)

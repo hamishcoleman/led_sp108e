@@ -9,6 +9,7 @@ import socket
 import random
 
 import commands as cmd
+import structures
 
 
 def txn(sock, sendbytes):
@@ -100,8 +101,7 @@ def test_frame(dotcount, firstrandom, firstfill):
     minlen1 = firstfill*stride    # address of last pixel with random color
     maxdots = dotcount*stride     # address of first non displayed pixel
 
-    # R G B followed by 12 unknown bytes
-    fill = bytearray([0x11, 0x00, 0x00])
+    fill = structures.RGB(0x11, 0, 0)
 
     a = bytearray(maxlen)
 
@@ -114,7 +114,7 @@ def test_frame(dotcount, firstrandom, firstfill):
         offset += stride
 
     while offset < maxdots:
-        a[offset:offset+3] = fill
+        a[offset:offset+3] = fill.bytes
         offset += stride
 
     return a
@@ -149,6 +149,16 @@ def subc_check_device(sock, args):
             )
         )
         challenge *= 2
+
+
+def subc_color(sock, args):
+    assert (len(args.subc_args) == 3), "command takes 3 args"
+    rgb = structures.RGB(
+        int(args.subc_args[0], 0),
+        int(args.subc_args[1], 0),
+        int(args.subc_args[2], 0),
+    )
+    txn(sock, cmd.color(rgb))
 
 
 def subc_get_device_name(sock, args):
@@ -209,7 +219,7 @@ def subc_status(sock, args):
     print("rgb_order =", state[5])
     print("dotperseg =", state[6]*256 + state[7])
     print("segs =", state[8]*256 + state[9])
-    print("staticcolor = {} {} {}".format(state[10], state[11], state[12]))
+    print("staticcolor = {}".format(structures.RGB(state[10:13])))
     print("ic_model =", state[13])
 
     assert_status_unknown(state)
@@ -251,6 +261,7 @@ def subc_testcmd(sock, args):
 # A list of all the sub-commands
 subc_cmds = {
     'check_device':     subc_check_device,
+    'color':            subc_color,
     'get_device_name':  subc_get_device_name,
     'mode_change':      subc_mode_change,
     'set_ic_model':     subc_set_ic_model,

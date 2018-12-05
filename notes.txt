@@ -208,23 +208,14 @@ Tested commands:
 ---
 CMD_CUSTOM_PREVIEW:
 
-With a 60 pixel array attached, some trials were done.
-Frames full of random pixels were sent in rapid sequence
+The app has been observed to send a frame packet size of 900 bytes
+thus there is room for 300 pixels.  If the controller is configred
+with a dot count larger than 300 (and more than 300 LEDs are connected)
+then display state corruption has been observed - perhaps there is
+a limit of 300 pixels per segment?
 
-Sending a frame with a packet size of less than 192 triplets did not show
-proper animation.
-
-Sending 192 triplets showed 40 pixels animating
-Sending 197 triplets showed 41 pixels animating
-Sending 202 triplets showed 42 pixels animating
-Sending 285 triplets showed 58 pixels animating
-Sending 290 triplets showed 59 pixels animating
-Sending 292 triplets showed 60 pixels animating
-
-
-With the observed frame packet size of 900 bytes there is room for
-300 pixels.  However, these are arranged differently depending on how
-many dots the controller has been configured to show.
+The pixels are arranged differently depending on how many dots the
+controller has been configured to show.
 
 int per_frame = 900  /* bytes */
 int per_pixel = 3    /* bytes */
