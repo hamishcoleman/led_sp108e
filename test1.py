@@ -252,6 +252,7 @@ def subc_testcmd(sock, args):
         # Ensure we keep in sync by sending a quick check
         cmd_check_device(sock, None)
 
+
 # A list of all the sub-commands
 subc_cmds = {
     'check_device':     subc_check_device,
