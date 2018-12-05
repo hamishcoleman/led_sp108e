@@ -28,3 +28,8 @@ CMD_GET_DEVICE_NAME = 0x77
 CMD_SET_DEVICE_TO_AP_MODE = 0x88
 CMD_TOGGLE_LAMP = 0xaa
 CMD_CHECK_DEVICE = 0xd5
+
+# if we know this command, record if we expect a response
+response = {
+    CMD_SPEED: False,
+}

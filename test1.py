@@ -20,17 +20,21 @@ def txn(sock, sendbytes):
     sock.send(sendbytes)
 
 
-def txn_sync(sock, sendbytes):
-    """ Perform a synchronous tx/rx transaction """
-
-    txn(sock, sendbytes)
-
+def rxn(sock):
+    """ Listen for a reply packet """
     recvbytes = sock.recv(4096)
 
     # TODO - if verbose
     print("< {}".format(recvbytes.hex()))
 
     return recvbytes
+
+
+def txn_sync(sock, sendbytes):
+    """ Perform a synchronous tx/rx transaction """
+
+    txn(sock, sendbytes)
+    return rxn(sock)
 
 
 def txn_sync_expect(sock, sendbytes, expectbytes):
@@ -248,7 +252,12 @@ def subc_testcmd(sock, args):
     else:
         data3 = 0
 
-    txn_sync(sock, frame(cmd, bytes([data1, data2, data3])))
+    txn(sock, frame(cmd, bytes([data1, data2, data3])))
+
+    if cmd not in commands.response or commands.response[cmd]:
+        # either we dont know if it responds, so we always listen
+        # or we know for sure it has a response, so we listen
+        rxn(sock)
 
 
 # A list of all the sub-commands
