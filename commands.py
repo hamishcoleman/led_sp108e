@@ -48,3 +48,8 @@ def frame(cmd, data):
         raise ValueError("data length max is 3")
 
     return bytes([CMD_FRAME_START]) + data + bytes([cmd, CMD_FRAME_END])
+
+
+def speed(speed):
+    """Set the speed of the programmed effect"""
+    return frame(CMD_SPEED, bytes([speed]))

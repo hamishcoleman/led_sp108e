@@ -10,3 +10,7 @@ def test_frame():
     assert b'\x38\x00\x00\x00\x7f\x83' == commands.frame(0x7f, None)
     assert b'\x38\x80\x00\x00\x0f\x83' == commands.frame(0xf, b'\x80')
     assert b'\x38\x01\x20\x44\x01\x83' == commands.frame(1, b'\x01\x20\x44')
+
+
+def test_speed():
+    assert b'\x38\x64\x00\x00\x03\x83' == commands.speed(100)

@@ -44,10 +44,6 @@ def txn_sync_expect(sock, sendbytes, expectbytes):
     return r
 
 
-def cmd_speed(sock, speed):
-    return txn(sock, cmd.frame(cmd.CMD_SPEED, bytes([speed])))
-
-
 def cmd_sync(sock):
     return txn_sync(sock, cmd.frame(cmd.CMD_SYNC, None))
 
@@ -181,7 +177,7 @@ def subc_speed(sock, args):
     assert (len(args.subc_args) == 1), "speed command takes 1 arg"
 
     speed = int(args.subc_args[0])
-    cmd_speed(sock, speed)
+    txn(sock, cmd.speed(speed))
 
 
 def subc_status(sock, args):

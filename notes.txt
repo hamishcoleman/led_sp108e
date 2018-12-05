@@ -140,7 +140,7 @@ Tested commands:
 0x00:           no response
 0x01:           no response
 0x02:           CMD_CUSTOM_EFFECT, sets all white, data appears to do something
-0x03:           cmd_speed() works
+0x03:           commands.speed()
 0x04:           no response
 0x05:           no response
 0x06:           CMD_MODE_AUTO, data appears to be ignored
