@@ -135,6 +135,13 @@ def subc_testpreview(sock, args):
         txn_sync_expect(sock, a, b'\x31')
 
 
+def subc_brightness(sock, args):
+    """Set the brightness"""
+    assert (len(args.subc_args) == 1), "ommand takes 1 arg"
+    brightness = int(args.subc_args[0], 0)
+    txn(sock, cmd.brightness(brightness))
+
+
 def subc_check_device(sock, args):
     """Send a bunch of check device packets"""
     assert (len(args.subc_args) == 1), "check_device command takes 1 arg"
@@ -161,6 +168,12 @@ def subc_color(sock, args):
     txn(sock, cmd.color(rgb))
 
 
+def subc_dot_count(sock, args):
+    assert (len(args.subc_args) == 1), "command takes 1 arg"
+    dot_count = int(args.subc_args[0], 0)
+    txn(sock, cmd.dot_count(dot_count))
+
+
 def subc_get_device_name(sock, args):
     """Request device name"""
     name = txn_sync(sock, cmd.get_device_name()).decode('utf8')
@@ -172,6 +185,12 @@ def subc_mode_change(sock, args):
     assert (len(args.subc_args) == 1), "command takes 1 arg"
     mode = int(args.subc_args[0], 0)
     txn(sock, cmd.mode_change(mode))
+
+
+def subc_sec_count(sock, args):
+    assert (len(args.subc_args) == 1), "command takes 1 arg"
+    sec_count = int(args.subc_args[0], 0)
+    txn(sock, cmd.sec_count(sec_count))
 
 
 def subc_set_ic_model(sock, args):
@@ -260,10 +279,13 @@ def subc_testcmd(sock, args):
 
 # A list of all the sub-commands
 subc_cmds = {
+    'brightness':       subc_brightness,
     'check_device':     subc_check_device,
     'color':            subc_color,
+    'dot_count':        subc_dot_count,
     'get_device_name':  subc_get_device_name,
     'mode_change':      subc_mode_change,
+    'sec_count':        subc_sec_count,
     'set_ic_model':     subc_set_ic_model,
     'speed':   subc_speed,
     'status':  subc_status,

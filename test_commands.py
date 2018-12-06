@@ -47,3 +47,15 @@ def test_set_ic_model():
 def test_color():
     rgb = structures.RGB(0x10, 0x20, 0x30)
     assert b'\x38\x10\x20\x30\x22\x83' == commands.color(rgb)
+
+
+def test_brightness():
+    assert b'\x38\x45\x00\x00\x2a\x83' == commands.brightness(0x45)
+
+
+def test_dot_count():
+    assert b'\x38\x23\x01\x00\x2d\x83' == commands.dot_count(0x123)
+
+
+def test_sec_count():
+    assert b'\x38\x06\x00\x00\x2e\x83' == commands.sec_count(6)

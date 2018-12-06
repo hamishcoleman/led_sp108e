@@ -31,11 +31,14 @@ CMD_CHECK_DEVICE = 0xd5
 
 # if we know this command, record if we expect a response
 response = {
+    CMD_BRIGHTNESS: False,
     CMD_CHECK_DEVICE: True,
     CMD_COLOR: False,
+    CMD_DOT_COUNT: False,
     CMD_GET_DEVICE_NAME: True,
     CMD_MODE_AUTO: False,
     CMD_MODE_CHANGE: False,
+    CMD_SEC_COUNT: False,
     CMD_SET_IC_MODEL: False,
     CMD_SPEED: False,
     CMD_SYNC: True,
@@ -127,3 +130,24 @@ def set_ic_model(model):
 def color(rgb):
     """Set the color to be used for the single-color patterns"""
     return frame(CMD_COLOR, rgb.bytes)
+
+
+def brightness(value):
+    """Set the color to be used for the single-color patterns"""
+    return _call1(CMD_BRIGHTNESS, value)
+
+
+def dot_count(value):
+    """configure the number of pixels in each segment"""
+
+    # TODO
+    # - range is 1 - 0x697, outside of which it transparently resets to 0x32
+    # - simple testing suggests that 300 pixels is the max
+    # should we check value here?
+
+    return frame(CMD_DOT_COUNT, value.to_bytes(2, 'little'))
+
+
+def sec_count(value):
+    """configure the number of sections in the display"""
+    return frame(CMD_SEC_COUNT, value.to_bytes(2, 'little'))
