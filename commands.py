@@ -74,14 +74,24 @@ def frame(cmd, data):
     return bytes([CMD_FRAME_START]) + data + bytes([cmd, CMD_FRAME_END])
 
 
+def _call0(cmd):
+    """Generic command packet with no parameters"""
+    return frame(cmd, None)
+
+
+def _call1(cmd, param1):
+    """Generic command packet with one parameter"""
+    return frame(cmd, bytes([param1]))
+
+
 def speed(speed):
     """Set the speed of the programmed effect"""
-    return frame(CMD_SPEED, bytes([speed]))
+    return _call1(CMD_SPEED, speed)
 
 
 def get_device_name():
     """Request the current device name"""
-    return frame(CMD_GET_DEVICE_NAME, None)
+    return _call0(CMD_GET_DEVICE_NAME)
 
 
 def check_device(challenge):
@@ -93,17 +103,17 @@ def mode_change(mode):
     """Request a display pattern mode change"""
     # I dont know why they didnt let you simply MODE_CHANGE to MODE_AUTO
     if mode == MODE_AUTO:
-        return frame(CMD_MODE_AUTO, None)
+        return _call0(CMD_MODE_AUTO)
 
     # TODO
     # - the screen freezes when given an invalid mode, maybe validate here?
 
-    return frame(CMD_MODE_CHANGE, bytes([mode]))
+    return _call1(CMD_MODE_CHANGE, mode)
 
 
 def sync():
     """Request a status response"""
-    return frame(CMD_SYNC, None)
+    return _call0(CMD_SYNC)
 
 
 def set_ic_model(model):
@@ -111,7 +121,7 @@ def set_ic_model(model):
     # TODO
     # - the screen freezes when given an invalid model, maybe validate here?
 
-    return frame(CMD_SET_IC_MODEL, bytes([model]))
+    return _call1(CMD_SET_IC_MODEL, model)
 
 
 def color(rgb):
