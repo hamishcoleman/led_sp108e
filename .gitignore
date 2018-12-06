@@ -1,0 +1,8 @@
+
+# ignore generated files
+__pycache__/
+.coverage
+htmlcov/
+
+# ignore compiled output
+x11-to-led
