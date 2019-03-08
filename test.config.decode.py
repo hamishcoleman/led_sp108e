@@ -192,5 +192,28 @@ for i in sorted(data.keys()):
 
     packet += bytes([guess])
 
+if len(packet) == 0:
+    print("WARN: No data found")
+    exit(1)
+
 print("")
 print(hexdump(packet))
+
+packet_len_total = packet[0]
+packet_len_psk = packet[1]
+packet_total_xor = packet[4]
+
+packet_psk = packet[9:9 + packet_len_psk]
+packet_ssid = packet[9 + packet_len_psk:packet_len_total]
+
+# TODO - this may not be true if the BSSID has been appended (which is
+# done in the published ESP TOUCH android app source)
+assert len(packet) == packet_len_total, "Received packet length mismatch"
+
+xor = 0
+for byte in packet:
+    xor ^= byte
+assert xor == 0, "Received packet failed xor test"
+
+print("PSK = {}".format(packet_psk))
+print("SSID = {}".format(packet_ssid))

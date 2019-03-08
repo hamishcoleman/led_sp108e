@@ -282,9 +282,15 @@ An example packet is shown below:
 H: 000: 1b 0c 29 16 af c0 a8 01 bf 61 61 61 61 62 62 62 |..)......aaaabbb|
 H: 010: 62 63 63 63 63 5a 5a 5a 5a 5a 5a                |bccccZZZZZZ|
 
+Looks like ESP-TOUCH
+( https://github.com/EspressifApp/EsptouchForAndroid/blob/master/esptouch/src/main/java/com/espressif/iot/esptouch/protocol/DatumCode.java#L29 )
+
     char len_total;
     char len_psk;
-    char unk[7];
+    char SSID CRC;
+    char BSSID CRC;
+    char TOTAL XOR
+    char ipaddress[4];
     char psk[];
     char ssid[];
 
